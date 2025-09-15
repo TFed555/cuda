@@ -13,6 +13,31 @@ void init_vectors(float** a, float** b, float** c, int N) {
     }
 }
 
+void copy_vectors(float* host_a, float* host_b, float* host_c, float** device_a, float** device_b, float** device_c, int N) {
+  size_t size = N * sizeof(float);
+
+  cudaMalloc(device_a, size);
+  cudaMalloc(device_b, size);
+  cudaMalloc(device_c, size);
+
+  cudaMemcpy(*device_a, host_a, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(*device_b, host_b, size, cudaMemcpyHostToDevice);
+
+}
+
+void free_vectors(float* a, float* b, float* c) {
+    free(a);
+    free(b);
+    free(c);
+}
+
+void cudafree_vectors(float* device_a, float* device_b, float* device_c) {
+
+    cudaFree(device_a);
+    cudaFree(device_b);
+    cudaFree(device_c);
+}
+
 __global__ void addVec(float* a, float* b, float* c, int N) {
   int i = blockDim.x * blockIdx.x + threadIdx.x;
   if (i<N) {

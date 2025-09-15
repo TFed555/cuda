@@ -2,13 +2,10 @@
 #include "benchmark/include/benchmark/benchmark.h"
 #include <iostream>
 
+//замер без выделения памяти CPU
 static void BENCHMARK_addVec_cpu(benchmark::State &state)
 {
     const int N = 256;
-    // size_t size = N * sizeof(float);
-    // float *a = new float[N];
-    // float *b = new float[N];
-    // float *c = new float[N];
 
     float *a, *b, *c;
     init_vectors(&a, &b, &c, N);
@@ -23,37 +20,26 @@ static void BENCHMARK_addVec_cpu(benchmark::State &state)
     {
         addVec_cpu(a, b, c, N);
     }
-    delete [] a;
-    delete [] b;
-    delete [] c;
+    
+    free_vectors(a, b, c);
 }
 
 BENCHMARK(BENCHMARK_addVec_cpu);
 
+//замер без выделения памяти GPU
 static void BENCHMARK_addVec(benchmark::State &state)
 {
-    const int N = 256;
-    size_t size = N * sizeof(float);
-    float* host_a = (float*) malloc(size);
-    float* host_b = (float*) malloc(size);
-    float* host_c = (float*) malloc(size);
+  const int N = 256;
+  size_t size = N * sizeof(float);
 
-    for (int i = 0; i <= N; i++)
-        {
-            host_a[i] = i;
-            host_b[i] = i;
-        }
+  float *host_a, *host_b, *host_c;
+  init_vectors(&host_a, &host_b, &host_c, N);
 
   float* device_a;
   float* device_b;
   float* device_c;
 
-  cudaMalloc(&device_a, size);
-  cudaMalloc(&device_b, size);
-  cudaMalloc(&device_c, size);
-
-  cudaMemcpy(device_a, host_a, size, cudaMemcpyHostToDevice);
-  cudaMemcpy(device_b, host_b, size, cudaMemcpyHostToDevice);
+  copy_vectors(host_a, host_b, host_c, &device_a, &device_b, &device_c, N);
 
   int threadsPerBlock = 256;
   int blocksPerGrid =(N + threadsPerBlock - 1) / threadsPerBlock;
@@ -65,13 +51,15 @@ static void BENCHMARK_addVec(benchmark::State &state)
 
     cudaMemcpy(host_c, device_c, size, cudaMemcpyDeviceToHost);
 
-    cudaFree(device_a);
-    cudaFree(device_b);
-    cudaFree(device_c);
+    cudafree_vectors(device_a, device_b, device_c);
+    // cudaFree(device_a);
+    // cudaFree(device_b);
+    // cudaFree(device_c);
 
-    free(host_a);
-    free(host_b);
-    free(host_c);
+    free_vectors(host_a, host_b, host_c);
+    // free(host_a);
+    // free(host_b);
+    // free(host_c);
 }
 
 BENCHMARK(BENCHMARK_addVec);
