@@ -5,10 +5,13 @@
 static void BENCHMARK_addVec_cpu(benchmark::State &state)
 {
     const int N = 256;
-    size_t size = N * sizeof(float);
-    float *a = new float[N];
-    float *b = new float[N];
-    float *c = new float[N];
+    // size_t size = N * sizeof(float);
+    // float *a = new float[N];
+    // float *b = new float[N];
+    // float *c = new float[N];
+
+    float *a, *b, *c;
+    init_vectors(&a, &b, &c, N);
 
     for (int i = 0; i <= N; i++)
         {
@@ -29,7 +32,7 @@ BENCHMARK(BENCHMARK_addVec_cpu);
 
 static void BENCHMARK_addVec(benchmark::State &state)
 {
-    const N = 256;
+    const int N = 256;
     size_t size = N * sizeof(float);
     float* host_a = (float*) malloc(size);
     float* host_b = (float*) malloc(size);
@@ -57,7 +60,7 @@ static void BENCHMARK_addVec(benchmark::State &state)
 
     for (auto _ : state)
     {
-        addVec(device_a, device_b, device_c, N);
+        addVec<<<blocksPerGrid, threadsPerBlock>>>(device_a, device_b, device_c, N);
     }
 
     cudaMemcpy(host_c, device_c, size, cudaMemcpyDeviceToHost);
@@ -66,9 +69,9 @@ static void BENCHMARK_addVec(benchmark::State &state)
     cudaFree(device_b);
     cudaFree(device_c);
 
-    delete [] a;
-    delete [] b;
-    delete [] c;
+    free(host_a);
+    free(host_b);
+    free(host_c);
 }
 
 BENCHMARK(BENCHMARK_addVec);
