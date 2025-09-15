@@ -20,6 +20,11 @@ file(GLOB_RECURSE SRC
 
 add_executable(work1_benchmarks ${SRC})
 
+add_test(NAME work1_benchmarks_csv
+    COMMAND work1_benchmarks --benchmark_format=csv --benchmark_out=benchmark_results.csv
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/benchmarks/results
+)
+
 target_compile_features(work1_benchmarks PRIVATE cxx_std_20)
 target_compile_options(work1_benchmarks PRIVATE -Wall -O3)
 

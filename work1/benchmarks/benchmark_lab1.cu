@@ -114,4 +114,9 @@ static void BENCHMARK_addVec2(benchmark::State &state)
 
 BENCHMARK(BENCHMARK_addVec2);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN();
+int main(int argc, char** argv) {
+  benchmark::Initialize(&argc, argv);
+  benchmark::RunSpecifiedBenchmarks();
+  benchmark::Shutdown();
+}
