@@ -8,8 +8,8 @@ void init_vectors(float** a, float** b, float** c, int N) {
     *c = (float*)malloc(size);
     
     for (int i = 0; i < N; i++) {
-        (*a + i) = (float)i;
-        (*b + i) = (float)i;
+        (*a)[i] = (float)i;
+        (*b)[i] = (float)i;
     }
 }
 

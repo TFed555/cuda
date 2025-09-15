@@ -1,5 +1,5 @@
 #include "../core/includes/lab1.cuh"
-#include "benchmark/include/benchmark/benchmark.h"
+#include "benchmark/benchmark.h"
 #include <iostream>
 
 //замер без выделения памяти CPU
