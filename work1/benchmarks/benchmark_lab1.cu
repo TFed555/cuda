@@ -1,4 +1,4 @@
-#include "../core/includes/lab1.cuh"
+#include "lab1.cuh"
 #include "benchmark/benchmark.h"
 #include <iostream>
 

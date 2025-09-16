@@ -35,7 +35,7 @@ target_link_libraries(work1_core PRIVATE
 )
 
 target_include_directories(work1_core PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/
+    ${CMAKE_CURRENT_SOURCE_DIR}/includes
     ${CUDA_INCLUDE_DIRS}
 )
 

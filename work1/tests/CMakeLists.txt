@@ -13,7 +13,7 @@ FetchContent_MakeAvailable(googletest)
 find_package(CUDAToolkit REQUIRED)
 
 file(GLOB_RECURSE SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/*.cu
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu
 )
 
 add_executable(work1_tests ${SRC})
@@ -22,7 +22,7 @@ target_compile_features(work1_tests PRIVATE cxx_std_20)
 target_compile_options(work1_tests PRIVATE -Wall -O3)
 
 target_include_directories(work1_tests PRIVATE
-    ${PROJECT_SOURCE_DIR}/Core/include
+    ${PROJECT_SOURCE_DIR}/core/includes
     ${gtest_SOURCE_DIR}/include
     ${gtest_BINARY_DIR}/include
 )
