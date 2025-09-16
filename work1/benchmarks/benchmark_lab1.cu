@@ -25,8 +25,8 @@ static void BENCHMARK_addVec_cpu(benchmark::State &state)
     free_vectors(a, b, c);
 }
 
-BENCHMARK(BENCHMARK_addVec_cpu)->Arg(1<<10)->Arg(1>>16)->Arg(1>>25);
-BENCHMARK(BENCHMARK_addVec_cpu)->Arg(1<<10)->Arg(1>>16)->Arg(1>>25)
+BENCHMARK(BENCHMARK_addVec_cpu)->Name("addVecCPU")->RangeMultiplier(2)->Range(1<<10, 1<<22);
+BENCHMARK(BENCHMARK_addVec_cpu)->Name("addVecCPUManual")->RangeMultiplier(2)->Range(1<<10, 1<<22)
 ->UseManualTime();
 
 //замер без выделения памяти GPU
@@ -45,7 +45,7 @@ static void BENCHMARK_addVec(benchmark::State &state)
 
   copy_vectors(host_a, host_b, host_c, &device_a, &device_b, &device_c, N);
 
-  int threadsPerBlock = state.range(1);
+  int threadsPerBlock = 128;
   int blocksPerGrid =(N + threadsPerBlock - 1) / threadsPerBlock;
 
     for (auto _ : state)
@@ -75,37 +75,25 @@ static void BENCHMARK_addVec(benchmark::State &state)
     free_vectors(host_a, host_b, host_c);
 }
 
-BENCHMARK(BENCHMARK_addVec)->Args({1<<10, 256})
-    ->Args({1<<16, 256})
-    ->Args({1<<25, 256})
-    ->Args({1<<10, 512})
-    ->Args({1<<16, 512})
-    ->Args({1<<25, 512})
-    ->ArgNames({"N","threadsPerBlock"});
+BENCHMARK(BENCHMARK_addVec)->Name("addVecGPUCore")->RangeMultiplier(2)->Range(1<<10, 1<<22)->ArgName("N");
 
-BENCHMARK(BENCHMARK_addVec)->Args({1<<10, 256})
-    ->Args({1<<16, 256})
-    ->Args({1<<25, 256})
-    ->Args({1<<10, 512})
-    ->Args({1<<16, 512})
-    ->Args({1<<25, 512})
-    ->ArgNames({"N","threadsPerBlock"})->UseManualTime();
+BENCHMARK(BENCHMARK_addVec)->Name("addVecGPUCoreManual")->RangeMultiplier(2)->Range(1<<10, 1<<22)->ArgName("N")->UseManualTime();
 
 //замер с выделением памяти CPU
-static void BENCHMARK_addVec_cpu2(benchmark::State &state)
-{
-    int N = state.range(0);
-    for (auto _ : state)
-    {
-        float *a, *b, *c;
-        init_vectors(&a, &b, &c, N);
-        addVec_cpu(a, b, c, N); 
-        free_vectors(a, b, c);
-    }
+// static void BENCHMARK_addVec_cpu2(benchmark::State &state)
+// {
+//     int N = state.range(0);
+//     for (auto _ : state)
+//     {
+//         float *a, *b, *c;
+//         init_vectors(&a, &b, &c, N);
+//         addVec_cpu(a, b, c, N); 
+//         free_vectors(a, b, c);
+//     }
 
-}
+// }
 
-BENCHMARK(BENCHMARK_addVec_cpu)->Arg(1<<10)->Arg(1>>16)->Arg(1>>25);
+// BENCHMARK(BENCHMARK_addVec_cpu2)->Name("addVec")->Arg(1<<10)->Arg(1<<16)->Arg(1<<25);
 
 //замер с выделением памяти GPU
 static void BENCHMARK_addVec2(benchmark::State &state)
@@ -124,7 +112,7 @@ static void BENCHMARK_addVec2(benchmark::State &state)
 
         copy_vectors(host_a, host_b, host_c, &device_a, &device_b, &device_c, N);
 
-        int threadsPerBlock = state.range(1);
+        int threadsPerBlock = 128;
         int blocksPerGrid =(N + threadsPerBlock - 1) / threadsPerBlock;
 
         addVec<<<blocksPerGrid, threadsPerBlock>>>(device_a, device_b, device_c, N);
@@ -137,13 +125,7 @@ static void BENCHMARK_addVec2(benchmark::State &state)
 
 }
 
-BENCHMARK(BENCHMARK_addVec)->Args({1<<10, 256})
-    ->Args({1<<16, 256})
-    ->Args({1<<25, 256})
-    ->Args({1<<10, 512})
-    ->Args({1<<16, 512})
-    ->Args({1<<25, 512})
-    ->ArgNames({"N","threadsPerBlock"});
+BENCHMARK(BENCHMARK_addVec2)->Name("addVecGPU")->RangeMultiplier(2)->Range(1<<10, 1<<22)->ArgName("N");
 
 // BENCHMARK_MAIN();
 int main(int argc, char** argv) {

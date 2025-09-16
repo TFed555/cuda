@@ -37,11 +37,11 @@ set_target_properties(work1_benchmarks PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/benchmarks
 )
 
-add_custom_target(run_benchmarks_csv
+add_custom_target(run_benchmarks_json
     COMMAND work1_benchmarks
-        --benchmark_format=csv > ${CMAKE_BINARY_DIR}/../benchmarks/results/benchmark_results.csv
-        --benchmark_out_format=csv
+        --benchmark_format=json > ${CMAKE_BINARY_DIR}/../plots/benchmark_results.json
+        --benchmark_out_format=json
     DEPENDS work1_benchmarks
-    COMMENT "Running benchmarks with CSV output"
+    COMMENT "Running benchmarks with JSON output"
     VERBATIM
 )
