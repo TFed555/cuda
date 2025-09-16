@@ -75,9 +75,9 @@ static void BENCHMARK_addVec(benchmark::State &state)
     free_vectors(host_a, host_b, host_c);
 }
 
-BENCHMARK(BENCHMARK_addVec)->Name("addVecGPUCore")->RangeMultiplier(2)->Range(1<<10, 1<<22)->ArgName("N");
+BENCHMARK(BENCHMARK_addVec)->Name("addVecGPUCore")->RangeMultiplier(2)->Range(1<<10, 1<<22);
 
-BENCHMARK(BENCHMARK_addVec)->Name("addVecGPUCoreManual")->RangeMultiplier(2)->Range(1<<10, 1<<22)->ArgName("N")->UseManualTime();
+BENCHMARK(BENCHMARK_addVec)->Name("addVecGPUCoreManual")->RangeMultiplier(2)->Range(1<<10, 1<<22)->UseManualTime();
 
 //замер с выделением памяти CPU
 // static void BENCHMARK_addVec_cpu2(benchmark::State &state)
@@ -125,7 +125,7 @@ static void BENCHMARK_addVec2(benchmark::State &state)
 
 }
 
-BENCHMARK(BENCHMARK_addVec2)->Name("addVecGPU")->RangeMultiplier(2)->Range(1<<10, 1<<22)->ArgName("N");
+BENCHMARK(BENCHMARK_addVec2)->Name("addVecGPUFull")->RangeMultiplier(2)->Range(1<<10, 1<<22);
 
 // BENCHMARK_MAIN();
 int main(int argc, char** argv) {
