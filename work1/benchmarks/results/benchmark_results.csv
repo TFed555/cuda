@@ -1,15 +1,28 @@
-2025-09-16T05:51:43+00:00
-Running ../bin/benchmarks/work1_benchmarks
-Run on (2 X 2250 MHz CPU s)
-CPU Caches:
-  L1 Data 32 KiB (x1)
-  L1 Instruction 32 KiB (x1)
-  L2 Unified 512 KiB (x1)
-  L3 Unified 16384 KiB (x1)
-Load Average: 0.42, 0.29, 0.36
-***WARNING*** Library was built as DEBUG. Timings may be affected.
 name,iterations,real_time,cpu_time,time_unit,bytes_per_second,items_per_second,label,error_occurred,error_message
-"BENCHMARK_addVec_cpu",13803832,51.1921,51.1571,ns,,,,,
-"BENCHMARK_addVec",7278749,79.9546,79.899,ns,,,,,
-"BENCHMARK_addVec_cpu2",5658970,127.276,127.18,ns,,,,,
-"BENCHMARK_addVec2",2608027,345.379,345.098,ns,,,,,
+"BENCHMARK_addVec_cpu/1024",2752653,255.086,254.954,ns,,,,,
+"BENCHMARK_addVec_cpu/0",11507862,62.8691,61.9781,ns,,,,,
+"BENCHMARK_addVec_cpu/0",11386348,61.2847,61.2411,ns,,,,,
+"BENCHMARK_addVec_cpu/1024/manual_time",3071264,214.762,250.457,ns,,,,,
+"BENCHMARK_addVec_cpu/0/manual_time",27018121,25.6967,61.4563,ns,,,,,
+"BENCHMARK_addVec_cpu/0/manual_time",27452598,25.6929,61.4941,ns,,,,,
+"BENCHMARK_addVec/N:1024/threadsPerBlock:256",57299,12984.1,12914.5,ns,,,,,
+"BENCHMARK_addVec/N:65536/threadsPerBlock:256",48201,15090,14663.4,ns,,,,,
+"BENCHMARK_addVec/N:33554432/threadsPerBlock:256",54811,12499.3,12486,ns,,,,,
+"BENCHMARK_addVec/N:1024/threadsPerBlock:512",57611,12327.7,12235.4,ns,,,,,
+"BENCHMARK_addVec/N:65536/threadsPerBlock:512",57560,11517.4,11488.7,ns,,,,,
+"BENCHMARK_addVec/N:33554432/threadsPerBlock:512",60540,12009.7,11997.9,ns,,,,,
+"BENCHMARK_addVec/N:1024/threadsPerBlock:256/manual_time",305520,2260.01,11131.3,ns,,,,,
+"BENCHMARK_addVec/N:65536/threadsPerBlock:256/manual_time",308755,2256.6,11562.7,ns,,,,,
+"BENCHMARK_addVec/N:33554432/threadsPerBlock:256/manual_time",269810,2341.82,11590.5,ns,,,,,
+"BENCHMARK_addVec/N:1024/threadsPerBlock:512/manual_time",294710,2317.23,11597.8,ns,,,,,
+"BENCHMARK_addVec/N:65536/threadsPerBlock:512/manual_time",329932,2153.64,11155.5,ns,,,,,
+"BENCHMARK_addVec/N:33554432/threadsPerBlock:512/manual_time",278232,2562.04,13278.7,ns,,,,,
+"BENCHMARK_addVec_cpu/1024",2765446,258.258,258.142,ns,,,,,
+"BENCHMARK_addVec_cpu/0",11361089,61.6631,61.6275,ns,,,,,
+"BENCHMARK_addVec_cpu/0",11395836,62.5614,61.9444,ns,,,,,
+"BENCHMARK_addVec/N:1024/threadsPerBlock:256",57097,12199.9,12194,ns,,,,,
+"BENCHMARK_addVec/N:65536/threadsPerBlock:256",56149,11879.8,11872,ns,,,,,
+"BENCHMARK_addVec/N:33554432/threadsPerBlock:256",59910,12280.9,12278,ns,,,,,
+"BENCHMARK_addVec/N:1024/threadsPerBlock:512",59313,11631.7,11591.3,ns,,,,,
+"BENCHMARK_addVec/N:65536/threadsPerBlock:512",62728,13722.9,13281.8,ns,,,,,
+"BENCHMARK_addVec/N:33554432/threadsPerBlock:512",55744,12574.2,12568.3,ns,,,,,

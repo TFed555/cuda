@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(work1_benchmarks LANGUAGES CXX CUDA)
 
-# ВАЖНО: Сначала подключаем benchmark
 include(FetchContent)
 
 FetchContent_Declare(
@@ -11,7 +10,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(benchmark)
 
-# Затем остальные зависимости
 find_package(CUDAToolkit REQUIRED)
 
 file(GLOB_RECURSE SRC
@@ -41,8 +39,7 @@ set_target_properties(work1_benchmarks PROPERTIES
 
 add_custom_target(run_benchmarks_csv
     COMMAND work1_benchmarks
-        --benchmark_format=csv
-        --benchmark_out=${CMAKE_BINARY_DIR}/../benchmarks/results/benchmark_results.csv
+        --benchmark_format=csv > ${CMAKE_BINARY_DIR}/../benchmarks/results/benchmark_results.csv
         --benchmark_out_format=csv
     DEPENDS work1_benchmarks
     COMMENT "Running benchmarks with CSV output"

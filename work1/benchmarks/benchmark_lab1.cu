@@ -1,29 +1,39 @@
 #include "../core/includes/lab1.cuh"
 #include "benchmark/benchmark.h"
 #include <iostream>
+#include <cmath>
+#include <chrono>
+
 
 //замер без выделения памяти CPU
 static void BENCHMARK_addVec_cpu(benchmark::State &state)
 {
-    const int N = 256;
-
+    int N = state.range(0);
     float *a, *b, *c;
     init_vectors(&a, &b, &c, N);
 
     for (auto _ : state)
     {
+        auto start = std::chrono::high_resolution_clock::now();
         addVec_cpu(a, b, c, N);
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> duration = end - start;
+
+        state.SetIterationTime(duration.count());
     }
     
     free_vectors(a, b, c);
 }
 
-BENCHMARK(BENCHMARK_addVec_cpu);
+BENCHMARK(BENCHMARK_addVec_cpu)->Arg(1<<10)->Arg(1>>16)->Arg(1>>25);
+BENCHMARK(BENCHMARK_addVec_cpu)->Arg(1<<10)->Arg(1>>16)->Arg(1>>25)
+->UseManualTime();
 
 //замер без выделения памяти GPU
 static void BENCHMARK_addVec(benchmark::State &state)
 {
-  const int N = 256;
+  int N = state.range(0);
+
   size_t size = N * sizeof(float);
 
   float *host_a, *host_b, *host_c;
@@ -35,34 +45,56 @@ static void BENCHMARK_addVec(benchmark::State &state)
 
   copy_vectors(host_a, host_b, host_c, &device_a, &device_b, &device_c, N);
 
-  int threadsPerBlock = 256;
+  int threadsPerBlock = state.range(1);
   int blocksPerGrid =(N + threadsPerBlock - 1) / threadsPerBlock;
 
     for (auto _ : state)
     {
+        cudaEvent_t start, stop;
+        float ms = 0.0f;
+        cudaEventCreate(&start);
+        cudaEventCreate(&stop);
+        cudaEventRecord(start, 0);
+
         addVec<<<blocksPerGrid, threadsPerBlock>>>(device_a, device_b, device_c, N);
+
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
+
+        cudaEventElapsedTime(&ms, start, stop);
+        cudaEventDestroy(start);
+        cudaEventDestroy(stop);
+
+        state.SetIterationTime(ms / 1000.0);
     }
 
     cudaMemcpy(host_c, device_c, size, cudaMemcpyDeviceToHost);
 
     cudafree_vectors(device_a, device_b, device_c);
-    // cudaFree(device_a);
-    // cudaFree(device_b);
-    // cudaFree(device_c);
 
     free_vectors(host_a, host_b, host_c);
-    // free(host_a);
-    // free(host_b);
-    // free(host_c);
 }
 
-BENCHMARK(BENCHMARK_addVec);
+BENCHMARK(BENCHMARK_addVec)->Args({1<<10, 256})
+    ->Args({1<<16, 256})
+    ->Args({1<<25, 256})
+    ->Args({1<<10, 512})
+    ->Args({1<<16, 512})
+    ->Args({1<<25, 512})
+    ->ArgNames({"N","threadsPerBlock"});
+
+BENCHMARK(BENCHMARK_addVec)->Args({1<<10, 256})
+    ->Args({1<<16, 256})
+    ->Args({1<<25, 256})
+    ->Args({1<<10, 512})
+    ->Args({1<<16, 512})
+    ->Args({1<<25, 512})
+    ->ArgNames({"N","threadsPerBlock"})->UseManualTime();
 
 //замер с выделением памяти CPU
 static void BENCHMARK_addVec_cpu2(benchmark::State &state)
 {
-    const int N = 256;
-
+    int N = state.range(0);
     for (auto _ : state)
     {
         float *a, *b, *c;
@@ -73,12 +105,12 @@ static void BENCHMARK_addVec_cpu2(benchmark::State &state)
 
 }
 
-BENCHMARK(BENCHMARK_addVec_cpu2);
+BENCHMARK(BENCHMARK_addVec_cpu)->Arg(1<<10)->Arg(1>>16)->Arg(1>>25);
 
 //замер с выделением памяти GPU
 static void BENCHMARK_addVec2(benchmark::State &state)
 {
-  const int N = 256;
+  int N = state.range(0);
   size_t size = N * sizeof(float);
 
     for (auto _ : state)
@@ -92,7 +124,7 @@ static void BENCHMARK_addVec2(benchmark::State &state)
 
         copy_vectors(host_a, host_b, host_c, &device_a, &device_b, &device_c, N);
 
-        int threadsPerBlock = 256;
+        int threadsPerBlock = state.range(1);
         int blocksPerGrid =(N + threadsPerBlock - 1) / threadsPerBlock;
 
         addVec<<<blocksPerGrid, threadsPerBlock>>>(device_a, device_b, device_c, N);
@@ -103,16 +135,15 @@ static void BENCHMARK_addVec2(benchmark::State &state)
         free_vectors(host_a, host_b, host_c);
     }
 
-    // cudaFree(device_a);
-    // cudaFree(device_b);
-    // cudaFree(device_c);
-
-    // free(host_a);
-    // free(host_b);
-    // free(host_c);
 }
 
-BENCHMARK(BENCHMARK_addVec2);
+BENCHMARK(BENCHMARK_addVec)->Args({1<<10, 256})
+    ->Args({1<<16, 256})
+    ->Args({1<<25, 256})
+    ->Args({1<<10, 512})
+    ->Args({1<<16, 512})
+    ->Args({1<<25, 512})
+    ->ArgNames({"N","threadsPerBlock"});
 
 // BENCHMARK_MAIN();
 int main(int argc, char** argv) {
