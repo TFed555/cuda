@@ -72,6 +72,6 @@ if __name__ == '__main__':
     plot()
     # print(objs_GPUFull, end="\n")
     # print(objs_GPUCore, end="\n")
-    print(objs_CPU, end="\n")
-    print(objs_GPUCore, end="\n")
+    # print(objs_CPU, end="\n")
+    # print(objs_GPUCore, end="\n")
     # print(objs_CPUManual, end="\n")

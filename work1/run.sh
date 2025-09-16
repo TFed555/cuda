@@ -1,5 +1,7 @@
 #!/bin/bash
 
 ./build/bin/tests/work1_tests
-make ./build/run_benchmarks_json
+cd ./build
+make run_benchmarks_json
+cd ..
 python3 ./plots/plots.py
