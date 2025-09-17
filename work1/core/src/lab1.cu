@@ -51,6 +51,7 @@ void addVec_cpu(float* a, float* b, float* c, int N) {
   }
 }
 
+
 // __host__ int main() {
   // const int N = 256;
   // size_t size = N * sizeof(float);

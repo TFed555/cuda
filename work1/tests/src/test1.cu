@@ -51,17 +51,17 @@ TEST(VecTests, AddGPUandCPU) {
     addVec<<<blocksGrid, threadsBlock>>>(device_a, device_b, device_c, N);
     cudaDeviceSynchronize();
     
-    float* gpu_result = new float[N];
-    cudaMemcpy(gpu_result, device_c, N * sizeof(float), cudaMemcpyDeviceToHost);
+    // float* gpu_result = new float[N];
+    cudaMemcpy(host_c, device_c, N * sizeof(float), cudaMemcpyDeviceToHost);
     
     float* cpu_result = new float[N];
     addVec_cpu(host_a, host_b, cpu_result, N);
     
     for (int i = 0; i < N; i++) {
-      EXPECT_FLOAT_EQ(gpu_result[i], cpu_result[i]);
+      EXPECT_FLOAT_EQ(host_c[i], cpu_result[i]);
     }
     
-    delete[] gpu_result;
+    // delete[] gpu_result;
     delete[] cpu_result;
     cudafree_vectors(device_a, device_b, device_c);
     free_vectors(host_a, host_b, host_c);
