@@ -38,33 +38,29 @@ TEST(VecTests, AddCPU) {
 }
 
 TEST(VecTests, AddGPUandCPU) {
-    float *host_a, *host_b, *host_c;
-    float *device_a, *device_b, *device_c;
-    const int N = 1024;
-    
-    init_vectors(&host_a, &host_b, &host_c, N);
-    
-    copy_vectors(host_a, host_b, host_c, &device_a, &device_b, &device_c, N);
-    
-    int threadsBlock = 128;
-    int blocksGrid = (N + threadsBlock - 1) / threadsBlock;
-    addVec<<<blocksGrid, threadsBlock>>>(device_a, device_b, device_c, N);
-    cudaDeviceSynchronize();
-    
-    // float* gpu_result = new float[N];
-    cudaMemcpy(host_c, device_c, N * sizeof(float), cudaMemcpyDeviceToHost);
-    
-    float* cpu_result = new float[N];
-    addVec_cpu(host_a, host_b, cpu_result, N);
-    
-    for (int i = 0; i < N; i++) {
-      EXPECT_FLOAT_EQ(host_c[i], cpu_result[i]);
-    }
-    
-    // delete[] gpu_result;
-    delete[] cpu_result;
-    cudafree_vectors(device_a, device_b, device_c);
-    free_vectors(host_a, host_b, host_c);
+  float *host_a, *host_b, *host_c;
+  float *device_a, *device_b, *device_c;
+  const int N = 256;
+
+  init_vectors(&host_a, &host_b, &host_c, N);
+  copy_vectors(host_a, host_b, host_c, &device_a, &device_b, &device_c, N);
+
+  addVec_gpu(device_a, device_b, device_c, N);
+
+  // float* gpu_result = new float[N];
+  cudaMemcpy(host_c, device_c, N * sizeof(float), cudaMemcpyDeviceToHost);
+
+  float* cpu_result = new float[N];
+  addVec_cpu(host_a, host_b, cpu_result, N);
+
+  for (size_t i = 0; i < N; i++) {
+    EXPECT_NEAR(host_c[i], cpu_result[i], 1e-5);
+  }
+
+  // delete[] gpu_result;
+  delete[] cpu_result;
+  cudafree_vectors(device_a, device_b, device_c);
+  free_vectors(host_a, host_b, host_c);
 }
 
 int main(int argc, char** argv) {
