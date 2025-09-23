@@ -6,28 +6,21 @@
 
 
 //замер без выделения памяти CPU
-static void BENCHMARK_addVec_cpu(benchmark::State &state)
-{
-    int N = state.range(0);
-    float *a, *b, *c;
-    init_vectors(&a, &b, &c, N);
+static void BENCHMARK_addVec_cpu(benchmark::State& state) {
+  const int N = 256;
 
-    for (auto _ : state)
-    {
-        auto start = std::chrono::high_resolution_clock::now();
-        addVec_cpu(a, b, c, N);
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> duration = end - start;
+  float *a, *b, *c;
+  init_vectors(&a, &b, &c, N);
 
-        state.SetIterationTime(duration.count());
-    }
-    
-    free_vectors(a, b, c);
+  for (auto _ : state) {
+    addVec_cpu(a, b, c, N);
+    benchmark::DoNotOptimize(c);
+  }
+
+  free_vectors(a, b, c);
 }
 
 BENCHMARK(BENCHMARK_addVec_cpu)->Name("addVecCPU")->RangeMultiplier(2)->Range(1<<10, 1<<22);
-BENCHMARK(BENCHMARK_addVec_cpu)->Name("addVecCPUManual")->RangeMultiplier(2)->Range(1<<10, 1<<22)
-->UseManualTime();
 
 //замер без выделения памяти GPU
 static void BENCHMARK_addVec(benchmark::State &state)
@@ -45,27 +38,11 @@ static void BENCHMARK_addVec(benchmark::State &state)
 
   copy_vectors(host_a, host_b, host_c, &device_a, &device_b, &device_c, N);
 
-  int threadsPerBlock = 128;
-  int blocksPerGrid =(N + threadsPerBlock - 1) / threadsPerBlock;
 
     for (auto _ : state)
     {
-        cudaEvent_t start, stop;
-        float ms = 0.0f;
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, 0);
-
-        addVec<<<blocksPerGrid, threadsPerBlock>>>(device_a, device_b, device_c, N);
-
-        cudaEventRecord(stop, 0);
-        cudaEventSynchronize(stop);
-
-        cudaEventElapsedTime(&ms, start, stop);
-        cudaEventDestroy(start);
-        cudaEventDestroy(stop);
-
-        state.SetIterationTime(ms / 1000.0);
+        addVec_gpu(device_a, device_b, device_c, N);
+        benchmark::DoNotOptimize(device_c);
     }
 
     cudaMemcpy(host_c, device_c, size, cudaMemcpyDeviceToHost);
@@ -76,8 +53,6 @@ static void BENCHMARK_addVec(benchmark::State &state)
 }
 
 BENCHMARK(BENCHMARK_addVec)->Name("addVecGPUCore")->RangeMultiplier(2)->Range(1<<10, 1<<22);
-
-BENCHMARK(BENCHMARK_addVec)->Name("addVecGPUCoreManual")->RangeMultiplier(2)->Range(1<<10, 1<<22)->UseManualTime();
 
 //замер с выделением памяти CPU
 // static void BENCHMARK_addVec_cpu2(benchmark::State &state)
@@ -112,10 +87,8 @@ static void BENCHMARK_addVec2(benchmark::State &state)
 
         copy_vectors(host_a, host_b, host_c, &device_a, &device_b, &device_c, N);
 
-        int threadsPerBlock = 128;
-        int blocksPerGrid =(N + threadsPerBlock - 1) / threadsPerBlock;
-
-        addVec<<<blocksPerGrid, threadsPerBlock>>>(device_a, device_b, device_c, N);
+        addVec_gpu(device_a, device_b, device_c, N);
+        benchmark::DoNotOptimize(device_c);
 
         cudaMemcpy(host_c, device_c, size, cudaMemcpyDeviceToHost);
 
