@@ -51,6 +51,13 @@ void addVec_cpu(float* a, float* b, float* c, int N) {
   }
 }
 
+void addVec_gpu(float* a, float* b, float* c, int N) {
+  int threads_block = 128;
+  int blocks_grid = (N + threads_block - 1) / threads_block;
+  addVec<<<blocks_grid, threads_block>>>(a, b, c, N);
+}
+
+
 // __host__ int main() {
   // const int N = 256;
   // size_t size = N * sizeof(float);
