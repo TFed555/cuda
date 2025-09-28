@@ -4,10 +4,31 @@ void addVec_cpu(float* a, float* b, float* c, int N);
 
 void addVec_gpu(float* a, float* b, float* c, int N);
 
-void init_vectors(float** a, float** b, float** c, int N);
+enum class VecType {
+    Host,
+    Device
+};
 
-void copy_vectors(float* host_a, float* host_b, float* host_c, float** device_a, float** device_b, float** device_c, int N);
+template<typename T>
+class Vectors {
+private:
+    struct Vec {
+        T* ptr;
+        VecType type;
+    };
+    std::vector<Vec> vectors;
+    size_t N;
+    size_t size;
 
-void free_vectors(float* a, float* b, float* c);
-
-void cudafree_vectors(float* device_a, float* device_b, float* device_c);
+public:
+    Vectors(int N, int countVecs);
+    Vectors(int N, int countVecs, bool cudaDevice);
+    
+    ~Vectors();
+    
+    void init_vectors(std::initializer_list<T*> pointers);
+    void copy_device_vectors(std::initializer_list<T*> host_pointers,
+                std::initializer_list<T*> device_pointers, 
+                 bool fromDevice);
+    std::vector<T*> getVectors(int inds);
+};
