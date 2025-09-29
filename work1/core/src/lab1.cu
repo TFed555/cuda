@@ -27,123 +27,95 @@ enum class VecType {
 };
 
 template<typename T>
-class Vectors {
+class Vector {
   private:
     struct Vec {
       T* ptr;
       VecType type;
     };
-    std::vector<Vec> vectors;
+    Vec vector;
     size_t N;
     size_t size;
 
   public:
-    Vectors(int N, int countVecs) : N(N), size(N*sizeof(T)) {
-        vectors.resize(countVecs);
-
-        for (size_t i = 0; i < countVecs; i++) {
-          vectors[i].ptr = static_cast<T*>(malloc(size));
-          vectors[i].type = VecType::Host;
-        }
+    Vector(int N) : N(N), size(N*sizeof(T)) {
+          vector.ptr = static_cast<T*>(malloc(size));
+          vector.type = VecType::Host;
     }
 
-    Vectors(int N, int countVecs, bool cudaDevice) : N(N), size(N*sizeof(T)) {
-        vectors.resize(countVecs);
-
-        for(size_t i = 0; i < countVecs; i++) {
+    Vector(int N, bool cudaDevice) : N(N), size(N*sizeof(T)) {
           T* devptr = nullptr;
           cudaMalloc(&devptr, size);
-          vectors[i].ptr = devptr;
-          vectors[i].type = VecType::Device;
-        }
+          vector.ptr = devptr;
+          vector.type = VecType::Device;
     }
 
-    ~Vectors() {
-      for (auto vec:vectors) {
-        if (vec.type == VecType::Host) {
-          free(vec.ptr);
+    ~Vector() {
+        if (vector.type == VecType::Host) {
+          free(vector.ptr);
         }
         else{
-          cudaFree(vec.ptr);
+          cudaFree(vector.ptr);
         }
-      }
     }
 
-    void init_vectors(std::initializer_list<T*> pointers) {
-      for (auto ptr:pointers) {
+    T& operator[](size_t i) {
+        return vector.ptr[i];
+    }
+
+    T* ptr() {
+      return vector.ptr;
+    }
+
+    void init_vector() {
         for (size_t i = 0; i < N; i++) {
-          ptr[i] = static_cast<T>(i);
-        }
+          vector.ptr[i] = static_cast<T>(i);
       }
     }
 
-    void copy_device_vectors(std::initializer_list<T*> host_pointers,
-                          std::initializer_list<T*> device_pointers, bool fromDevice) {
-      auto host_it = host_pointers.begin();
-      auto device_it = device_pointers.begin();
+    void copy_to_device(float* host_ptr) {
+      cudaMemcpy(vector.ptr, host_ptr, size, cudaMemcpyHostToDevice);
+    }
 
-      if (host_pointers.size() != device_pointers.size()) {
-        std::cout << "Sizes of lists must be same" << std::endl;
-        return;
-      }
-
-      while (host_it != host_pointers.end()) {
-        if (fromDevice) {
-          cudaMemcpy(*host_it, device_it, size, cudaMemcpyDeviceToHost);
-        }
-        else {
-          cudaMemcpy(*device_it, host_it, size, cudaMemcpyHostToDevice);
-        }
-        host_it++;
-        device_it++;
-      }
+    void copy_to_host(float* host_ptr) {
+      cudaMemcpy(host_ptr, vector.ptr, size, cudaMemcpyDeviceToHost);
     }
     
-   std::vector<T*> getVectors(int inds) {
-      std::vector<T*> vecs;
-      for (int i = 0; i < inds; i++) {
-        vecs.push_back(vectors.at(i).ptr);
-      }
-      return vecs;
-    }
 };
 
 int main() {
-  int N = 256;
-  Vectors<float> host_vectors(N, 3);
-  std::vector<float*> vecs = host_vectors.getVectors(3);
+  int N = 20;
+  Vector<float> h_a(N);
+  Vector<float> h_b(N);
+  Vector<float> h_c(N);
 
-  float *a = vecs[0];
-  float *b = vecs[1];
-  float *c = vecs[2];
-
-  host_vectors.init_vectors({a, b});
-  // for (int i=0; i<N;i++) {
-  //   std::cout<<"host_A: "<<a[i]<<" ";
-  //   std::cout<<"host_B: "<<b[i]<<std::endl;
-  // }
-
-  addVec_cpu(a, b, c, N);
-
-  // for (int i=0; i<N;i++) {
-  //   std::cout<<"host_C: "<a[i]<<std::endl;
-  // }
-
-  Vectors<float> device_vectors(N, 3, true);
-  std::vector<float*> d_vecs = device_vectors.getVectors(3);
-
-  float *d_a = d_vecs[0];
-  float *d_b = d_vecs[1];
-  float *d_c = d_vecs[2];
-
-  device_vectors.copy_device_vectors({a, b}, {d_a, d_b}, false);
-
-  addVec_gpu(d_a, d_b, d_c, N);
-
-  device_vectors.copy_device_vectors({c}, {d_c}, true);
+  h_a.init_vector();
+  h_b.init_vector();
 
   for (int i=0; i<N;i++) {
-    std::cout<<"C: "<<c[i]<<std::endl;
+    std::cout<<"host_A: "<<h_a[i]<<" ";
+    std::cout<<"host_B: "<<h_b[i]<<std::endl;
+  }
+
+  addVec_cpu(h_a.ptr(), h_b.ptr(), h_c.ptr(), N);
+
+  for (int i=0; i<N;i++) {
+    std::cout<<"host_C: "<< h_c[i]<< std::endl;
+  }
+
+  Vector<float> d_a(N, true);
+  Vector<float> d_b(N, true);
+  Vector<float> d_c(N, true);
+
+  d_a.copy_to_device(h_a.ptr());
+  d_b.copy_to_device(h_b.ptr());
+
+  addVec_gpu(d_a.ptr(), d_b.ptr(), d_c.ptr(), N);
+
+  d_c.copy_to_host(h_c.ptr());
+
+  for (int i=0; i<N;i++) {
+    std::cout<<"d_C: "<<h_c[i]<<std::endl;
   }
 
 }
