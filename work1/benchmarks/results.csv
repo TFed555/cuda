@@ -1,5 +1,0 @@
-name,iterations,real_time,cpu_time,time_unit,bytes_per_second,items_per_second,label,error_occurred,error_message
-"BENCHMARK_addVec_cpu",774324,904.347,903.83,ns,,,,,
-"BENCHMARK_addVec",7608693,93.8984,93.7948,ns,,,,,
-"BENCHMARK_addVec_cpu2",380511,1877.32,1874.88,ns,,,,,
-"BENCHMARK_addVec2",595424,1212.48,1210.96,ns,,,,,

@@ -22,7 +22,7 @@ target_compile_features(work1_benchmarks PRIVATE cxx_std_20)
 target_compile_options(work1_benchmarks PRIVATE -Wall -O3)
 
 target_include_directories(work1_benchmarks PRIVATE
-    ${PROJECT_SOURCE_DIR}/core/includes
+    ${PROJECT_SOURCE_DIR}/core/include
     ${benchmark_SOURCE_DIR}/include
     ${benchmark_BINARY_DIR}/include
 )

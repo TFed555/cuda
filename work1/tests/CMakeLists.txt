@@ -24,7 +24,7 @@ target_compile_features(work1_tests PRIVATE cxx_std_20)
 target_compile_options(work1_tests PRIVATE -Wall -O3)
 
 target_include_directories(work1_tests PRIVATE
-    ${PROJECT_SOURCE_DIR}/core/includes
+    ${PROJECT_SOURCE_DIR}/core/include
     ${gtest_SOURCE_DIR}/include
     ${gtest_BINARY_DIR}/include
 )
