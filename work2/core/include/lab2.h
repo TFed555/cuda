@@ -9,81 +9,114 @@ void addMultiMatrix_cpu(float* x, float* w, float* b, float* res, int rows, int 
 
 void addMultiMatrix_gpu(float* x, float* w, float* b, float* res, int rows, int cols, int K);
 
-enum class VecType {
+enum class MatType {
     Host,
     Device
 };
 
 template<typename T>
-class Vector {
+class Matrix {
 private:
-    struct Vec {
+    struct Mat {
         T* ptr;
-        VecType type;
+        MatType type;
     };
-    Vec vector;
-    size_t N;
-    size_t size;
+    Mat matrix;
+    size_t rows;
+    size_t cols;
+    size_t total_size;
+    size_t byte_size;
 
 public:
-    Vector(int N);
-    Vector(int N, bool cudaDevice);
+    Matrix(size_t rows, size_t cols);
+    Matrix(size_t rows, size_t cols, bool cudaDevice);
     
-    ~Vector();
+    ~Matrix();
     
-    T& operator[](size_t i);
-    T* ptr();
-    void init_vector();
-    void copy_to_device(float* host_ptr);
-    void copy_to_host(float* host_ptr);
+    T& operator()(size_t i, size_t j);
+    const T& operator()(size_t i, size_t j) const;
+
+    T* ptr() { return matrix.ptr; }
+
+    size_t getRows() const { return rows; }
+    size_t getCols() const { return cols; }
+    size_t getTotalSize() const { return total_size; }
+
+    void init_matrix();
+    void init_matrix_value(T value);
+    void copy_to_host(const Matrix<T>& device_mat);
+    void copy_to_device(Matrix<T>& device_mat) const;
 };
 
 template<typename T>
-Vector<T>::Vector(int N) : N(N), size(N*sizeof(T)) {
-    vector.ptr = static_cast<T*>(malloc(size));
-    vector.type = VecType::Host;
+Matrix<T>::Matrix(size_t rows, size_t cols) 
+    : rows(rows), cols(cols), total_size(rows * cols), byte_size(total_size * sizeof(T)) {
+    matrix.ptr = static_cast<T*>(malloc(byte_size));
+    matrix.type = MatType::Host;
 }
 
 template<typename T>
-Vector<T>::Vector(int N, bool cudaDevice) : N(N), size(N*sizeof(T)) {
+Matrix<T>::Matrix(size_t rows, size_t cols, bool cudaDevice) 
+    : rows(rows), cols(cols), total_size(rows * cols), byte_size(total_size * sizeof(T)) {
     T* devptr = nullptr;
-    cudaMalloc(&devptr, size);
-    vector.ptr = devptr;
-    vector.type = VecType::Device;
+    cudaMalloc(&devptr, byte_size);
+    matrix.ptr = devptr;
+    matrix.type = MatType::Device;
 }
 
 template<typename T>
-Vector<T>::~Vector() {
-    if (vector.type == VecType::Host) {
-        free(vector.ptr);
+Matrix<T>::~Matrix() {
+  if (matrix.ptr) {
+    if (matrix.type == MatType::Host) {
+      free(matrix.ptr);
     } else {
-        cudaFree(vector.ptr);
+      cudaFree(matrix.ptr);
+    }
+  }
+}
+
+template<typename T>
+T& Matrix<T>::operator()(size_t i, size_t j) {
+    return matrix.ptr[i * cols + j];
+}
+
+template<typename T>
+const T& Matrix<T>::operator()(size_t i, size_t j) const {
+    return matrix.ptr[i * cols + j];
+}
+
+template<typename T>
+void Matrix<T>::init_matrix() {
+    if (matrix.type != MatType::Host) {
+        return;
+    }
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            (*this)(i, j) = static_cast<T>(i * cols + j);
+        }
     }
 }
 
 template<typename T>
-T& Vector<T>::operator[](size_t i) {
-    return vector.ptr[i];
-}
-
-template<typename T>
-T* Vector<T>::ptr() {
-    return vector.ptr;
-}
-
-template<typename T>
-void Vector<T>::init_vector() {
-    for (size_t i = 0; i < N; i++) {
-        vector.ptr[i] = static_cast<T>(i);
+void Matrix<T>::init_matrix_value(T value) {
+    if (matrix.type != MatType::Host) {
+        return;
+    }
+    for (size_t i = 0; i < total_size; i++) {
+        matrix.ptr[i] = value;
     }
 }
 
 template<typename T>
-void Vector<T>::copy_to_device(float* host_ptr) {
-    cudaMemcpy(vector.ptr, host_ptr, size, cudaMemcpyHostToDevice);
+void Matrix<T>::copy_to_host(const Matrix<T>& device_mat) {
+    if (matrix.type == MatType::Host && device_mat.matrix.type == MatType::Device) {
+        cudaMemcpy(matrix.ptr, device_mat.matrix.ptr, byte_size, cudaMemcpyDeviceToHost);
+    }
 }
 
 template<typename T>
-void Vector<T>::copy_to_host(float* host_ptr) {
-    cudaMemcpy(host_ptr, vector.ptr, size, cudaMemcpyDeviceToHost);
+void Matrix<T>::copy_to_device(Matrix<T>& device_mat) const {
+    if (matrix.type == MatType::Host && device_mat.matrix.type == MatType::Device) {
+        cudaMemcpy(device_mat.matrix.ptr, matrix.ptr, byte_size, cudaMemcpyHostToDevice);
+    }
 }

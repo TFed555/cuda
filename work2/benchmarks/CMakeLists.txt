@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(work1_benchmarks LANGUAGES CXX CUDA)
+project(work2_benchmarks LANGUAGES CXX CUDA)
 
 include(FetchContent)
 
@@ -16,24 +16,24 @@ file(GLOB_RECURSE SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cu
 )
 
-add_executable(work1_benchmarks ${SRC})
+add_executable(work2_benchmarks ${SRC})
 
-target_compile_features(work1_benchmarks PRIVATE cxx_std_20)
-target_compile_options(work1_benchmarks PRIVATE -Wall -O3)
+target_compile_features(work2_benchmarks PRIVATE cxx_std_20)
+target_compile_options(work2_benchmarks PRIVATE -Wall -O3)
 
-target_include_directories(work1_benchmarks PRIVATE
+target_include_directories(work2_benchmarks PRIVATE
     ${PROJECT_SOURCE_DIR}/core/include
     ${benchmark_SOURCE_DIR}/include
     ${benchmark_BINARY_DIR}/include
 )
 
-target_link_libraries(work1_benchmarks PRIVATE
-    work1::core
+target_link_libraries(work2_benchmarks PRIVATE
+    work2::core
     CUDA::cudart
     benchmark::benchmark
 )
 
-set_target_properties(work1_benchmarks PROPERTIES
+set_target_properties(work2_benchmarks PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/benchmarks
 )
 
