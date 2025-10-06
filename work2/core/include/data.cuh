@@ -1,7 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include <cuda
+#include <cuda_runtime.h>
 #include "kinds.h"
 
 template <AtomKind AtomT>
@@ -12,11 +12,11 @@ private:
 public:
   using atom_t = AtomT;
   Data(std::size_t size) : size_(size), data_(nullptr) {
-    cudaMalloc(&data_, size*sizeof(AtomT));
+    cudaMalloc(&data_, size_*sizeof(AtomT));
   }
 
   Data(const Data& other) : size_(other.size_), data_(nullptr) {
-    cudaMalloc(&data_, size*sizeof(AtomT));
+    cudaMalloc(&data_, size_*sizeof(AtomT));
     if (other.data_ != nullptr) {
       cudaMemcpy(data_, other.data_, size_*sizeof(AtomT), cudaMemcpyDeviceToDevice);
     }
@@ -51,7 +51,7 @@ public:
     return data_;
   }
 
-  const std::size_t size() {
+  std::size_t size() {
     return size_;
   }
 

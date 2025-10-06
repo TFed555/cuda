@@ -13,13 +13,13 @@ class MatrixView {
     std::size_t ncols_;
   public:
     MatrixView(AtomT* data, std::size_t nrows, std::size_t ncols)
-    : data  _(data), nrows_(nrows), ncols_(ncols) {};
+    : data_(data), nrows_(nrows), ncols_(ncols) {};
 
     ~MatrixView() {};
 
-    std::size_t size() const { return nrows_ * ncols_; }
-    std::size_t nrows() const { return nrows_; }
-    std::size_t ncols() const { return ncols_; }
+     __host__ __device__  std::size_t size() const { return nrows_ * ncols_; }
+     __host__ __device__  std::size_t nrows() const { return nrows_; }
+     __host__ __device__  std::size_t ncols() const { return ncols_; }
 
     __host__ __device__ atom_t& operator[](std::size_t n) {
         return data_[n];
@@ -36,6 +36,6 @@ class MatrixView {
     __host__ __device__ const atom_t& operator() (std::size_t i, std::size_t j) const {
       return data_[i * ncols_ + j];
     }
-}
+};
 
 #endif
