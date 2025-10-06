@@ -5,7 +5,9 @@
 
 template<AtomKind AtomT>
 class MatrixView {
-  protected:
+  public:
+    using atom_t = AtomT;
+  private:
     AtomT* data_;
     std::size_t nrows_; 
     std::size_t ncols_;
@@ -13,19 +15,27 @@ class MatrixView {
     MatrixView(AtomT* data, std::size_t nrows, std::size_t ncols)
     : data  _(data), nrows_(nrows), ncols_(ncols) {};
 
-    virtual ~IMatrix() {};
+    ~MatrixView() {};
 
-    virtual std::size_t size() const = 0;
-    virtual std::size_t nrows() const = 0;
-    virtual std::size_t ncols() const = 0;
+    std::size_t size() const { return nrows_ * ncols_; }
+    std::size_t nrows() const { return nrows_; }
+    std::size_t ncols() const { return ncols_; }
 
-    virtual MatrixAccessor<AtomT> accessor() = 0;
-    virtual const MatrixAccessor<AtomT> accessor() const = 0;
+    __host__ __device__ atom_t& operator[](std::size_t n) {
+        return data_[n];
+    }
 
-    virtual AtomT& operator[] (std::size_t n) { return accessor()[n]; };
-    virtual const AtomT& operator[] (std::size_t n) { return accessor()[n]; }
-    virtual AtomT& operator() (std::size_t i, std::size_t j) { return accessor()(i,j);}
-    virtual const AtomT& operator() (std::size_t i, std::size_t j) const { return accessor()(i,j);}
+    __host__ __device__ const atom_t& operator[](std::size_t n) const {
+      return data_[n];
+    }
+
+    __host__ __device__ atom_t& operator() (std::size_t i, std::size_t j) {
+      return data_[i * ncols_ + j];
+    }
+
+    __host__ __device__ const atom_t& operator() (std::size_t i, std::size_t j) const {
+      return data_[i * ncols_ + j];
+    }
 }
 
 #endif

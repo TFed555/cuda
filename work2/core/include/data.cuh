@@ -1,6 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include <cuda
 #include "kinds.h"
 
 template <AtomKind AtomT>
@@ -61,7 +62,7 @@ public:
   void copy_to_device(AtomT* host_ptr) {
     cudaMemcpy(data_, host_ptr, size_*sizeof(AtomT), cudaMemcpyHostToDevice);
   }
-}
+};
 
 
 #endif
