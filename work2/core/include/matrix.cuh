@@ -1,6 +1,9 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include "kernels/kernel_init.cuh"
+#include "../utils/cuda_utils.cuh"
+
 #include "matrix_view.cuh"
 #include <memory>
 
@@ -21,6 +24,13 @@ class Matrix {
 
     Data<AtomT>& data() { return *data_; }
     const Data<AtomT>& data() const { return *data_; }
+
+    void init(AtomT val) {
+      dim3 block(16, 16);
+      dim3 grid = make_grid_2d(nrows(), ncols(), block);
+      kernel_matrix_init<<<grid, block>>>(view_, val);
+      cudaDeviceSynchronize();
+    }
 
     MatrixView<AtomT>& view() { return view_; }
     const MatrixView<AtomT>& view() const { return view_; }

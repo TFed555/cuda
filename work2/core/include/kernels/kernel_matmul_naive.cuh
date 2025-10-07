@@ -1,7 +1,7 @@
 #ifndef KERNEL_MATRIX_MUL
 #define KERNEL_MATRIX_MUL
 
-#include "matrix_view.cuh"
+#include "../matrix_view.cuh"
 
 template <AtomKind AtomT>
 __global__ void kernel_matmul_naive(MatrixView<AtomT> a, MatrixView<AtomT> b, 

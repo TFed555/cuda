@@ -1,7 +1,8 @@
 #ifndef KERNEL_MATRIX_INIT
 #define KERNEL_MATRIX_INIT
 
-#include "matrix.cuh"
+#include "../kinds.h"
+#include "../matrix_view.cuh"
 
 template <AtomKind AtomT>
 __global__ void kernel_matrix_init(MatrixView<AtomT> view, AtomT val) {

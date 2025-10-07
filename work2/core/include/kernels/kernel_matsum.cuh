@@ -1,7 +1,7 @@
 #ifndef KERNEL_MATRIX_ADD
 #define KERNEL_MATRIX_ADD
 
-#include "matrix_view.cuh"
+#include "../matrix_view.cuh"
 
 template <AtomKind AtomT>
 __global__ void kernel_matrix_sum(MatrixView<AtomT> a, MatrixView<AtomT> b, 

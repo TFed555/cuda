@@ -1,7 +1,7 @@
 #ifndef KERNEL_MATRIX_MUL_SCALAR
 #define KERNEL_MATRIX_MUL_SCALAR
 
-#include "matrix_view.cuh"
+#include "../matrix_view.cuh"
 
 template <AtomKind AtomT>
 __global__ void kernel_matmul_scalar(MatrixView<AtomT> a, AtomT val, 

@@ -1,6 +1,5 @@
 #include <iostream>
 #include "../include/matrix_operators.cuh"
-#include "../include/kernel_init.cuh"
 #include <vector>
 
 int main() {
@@ -10,12 +9,9 @@ int main() {
   Matrix<atom_t> B(4,4);
   Matrix<atom_t> C(4,4);
 
-  dim3 threads(4, 4);
-  dim3 blocks(1, 1);
-  kernel_matrix_init<<<blocks, threads>>>(A.view(), 1.0f);
-  cudaDeviceSynchronize();
-  kernel_matrix_init<<<blocks, threads>>>(B.view(), 10.0f);
-  cudaDeviceSynchronize();
+  
+  A.init(1.0f);
+  B.init(10.0f);
 
   C = A.view() * B.view();
   std::vector<atom_t> hostA(16);

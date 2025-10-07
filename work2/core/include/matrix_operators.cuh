@@ -2,9 +2,9 @@
 #define MATRIXOPERATORS_H
 
 #include "matrix.cuh"
-#include "kernel_matsum.cuh"
-#include "kernel_matmul_naive.cuh"  
-#include "kernel_matmul_scalar.cuh"
+#include "kernels/kernel_matsum.cuh"
+#include "kernels/kernel_matmul_naive.cuh"  
+#include "kernels/kernel_matmul_scalar.cuh"
 #include "../utils/cuda_utils.cuh"
 
 template <AtomKind AtomT>
