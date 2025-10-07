@@ -3,6 +3,7 @@
 
 #include "matrix.cuh"
 #include "kernel_matsum.cuh"
+#include "kernel_matmul_naive.cuh"
 
 template <AtomKind AtomT>
 Matrix<AtomT> operator+(const MatrixView<AtomT>& a, const MatrixView<AtomT>& b){
@@ -13,7 +14,21 @@ Matrix<AtomT> operator+(const MatrixView<AtomT>& a, const MatrixView<AtomT>& b){
   dim3 grid_size((a.ncols() + block_size.x - 1) / block_size.x, 
   (a.nrows() + block_size.y - 1) / block_size.y);
 
-  kernel_matrix_sum<<<grid_size, block_size>>>(a, b, res.view(), a.nrows(), a.ncols());
+  kernel_matrix_sum<<<grid_size, block_size>>>(a, b, res.view());
+
+  return res;
+}
+
+template <AtomKind AtomT>
+Matrix<AtomT> operator*(const MatrixView<AtomT>& a, const MatrixView<AtomT>& b){
+  if (a.ncols() != b.nrows()) { throw std::runtime_error("Can't multiply"); }
+  Matrix<AtomT> res(a.nrows(), b.ncols());
+
+  dim3 block_size(16, 16);
+  dim3 grid_size((a.ncols() + block_size.x - 1) / block_size.x, 
+  (a.nrows() + block_size.y - 1) / block_size.y);
+
+  kernel_matmul_naive<<<grid_size, block_size>>>(a, b, res.view());
 
   return res;
 }

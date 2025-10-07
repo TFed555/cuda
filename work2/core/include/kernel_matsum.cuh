@@ -5,11 +5,15 @@
 
 template <AtomKind AtomT>
 __global__ void kernel_matrix_sum(MatrixView<AtomT> a, MatrixView<AtomT> b, 
-                                MatrixView<AtomT> res, std::size_t rows, std::size_t cols) {
+                                MatrixView<AtomT> res) {
   int i = blockIdx.y * blockDim.y + threadIdx.y;
   int j = blockIdx.x * blockDim.x + threadIdx.x;
+
+  std::size_t rows = a.nrows();
+  std::size_t cols = a.ncols();
+
   if (i < rows && j < cols) {
-    res[i * cols + j] = a[i * cols + j] + b[i * cols + j];
+    res(i, j) = a(i, j) + b(i, j);
   }
 }
 
