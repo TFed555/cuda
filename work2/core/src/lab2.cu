@@ -18,7 +18,7 @@ int main() {
   cudaDeviceSynchronize();
 
   C = A.view() * B.view();
-    std::vector<atom_t> hostA(16);
+  std::vector<atom_t> hostA(16);
   A.data().copy_to_host(hostA.data());
     std::vector<atom_t> hostB(16);
   B.data().copy_to_host(hostB.data());
