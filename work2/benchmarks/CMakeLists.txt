@@ -37,6 +37,7 @@ target_compile_options(work2_benchmarks PRIVATE
 
 target_include_directories(work2_benchmarks PRIVATE
     ${PROJECT_SOURCE_DIR}/core/include
+    ${PROJECT_SOURCE_DIR}/core/utils
     ${benchmark_SOURCE_DIR}/include
     ${benchmark_BINARY_DIR}/include
     ${eigen_SOURCE_DIR}

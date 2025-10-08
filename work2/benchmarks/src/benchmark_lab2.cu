@@ -1,4 +1,6 @@
 #include "matrix_operators.cuh"
+#include "kernels/kernel_matmul_naive.cuh"
+#include "cuda_utils.cuh"
 #include "benchmark/benchmark.h"
 #include <iostream>
 #include <cmath>
@@ -40,8 +42,12 @@ static void BENCHMARK_matMul(benchmark::State& state) {
     B.init((float)(rand()) / (float)(rand()));
     cudaDeviceSynchronize();
 
+    dim3 block_size(16, 16);
+    dim3 grid_size = make_grid_2d(C.nrows(), C.ncols(), block_size);
+
     for (auto _ : state) {
-        C = A.view() * B.view();
+        // C = A.view() * B.view();
+        kernel_matmul_naive<<<grid_size, block_size>>>(A.view(), B.view(), C.view());
         cudaDeviceSynchronize();
         benchmark::DoNotOptimize(C.data());
     }
