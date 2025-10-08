@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "matrix_operators.cuh"
-
+#include <vector>
 #define EIGEN_NO_CUDA
 #include <Eigen/Dense>
 using Eigen::MatrixXf;
@@ -22,7 +22,16 @@ TYPED_TEST(MatrixTest, SumMatrix) {
   a.init(val);
   b.init(val);
 
-  res = a.view() + b.view();
+  std::vector<float> hostRes(2);
 
-  EXPECT_FLOAT_EQ(res.view()(0, 0), expected(0, 0));
+  res = a.view() + b.view();
+  res.data().copy_to_host(hostRes.data());
+
+  EXPECT_EQ(hostRes[0], expected(0, 0));
+
+  // for (int i = 0; i < 2; ++i) {
+  //   for (int j = 0; j < 2; ++j) {
+  //     EXPECT_EQ(hostRes[i*2+j], expected(i, j));
+  //   }
+  // }
 }
