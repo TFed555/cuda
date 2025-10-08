@@ -25,6 +25,8 @@ file(GLOB_RECURSE CUDA_SRC
 
 add_executable(work2_benchmarks ${CUDA_SRC})
 
+set_target_minimum_cuda_arch(work2_benchmarks 75)
+
 target_compile_features(work2_benchmarks PRIVATE cxx_std_20)
 target_compile_options(work2_benchmarks PRIVATE -Wall -O3)
 
@@ -50,6 +52,7 @@ set_target_properties(work2_benchmarks PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/benchmarks
 )
 
+set_target_properties(work2_benchmarks PROPERTIES CUDA_ARCHITECTURES "75")
 
 add_custom_target(run_benchmarks_json
     COMMAND work2_benchmarks

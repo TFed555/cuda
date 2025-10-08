@@ -36,45 +36,17 @@ static void BENCHMARK_matMul(benchmark::State& state) {
     Matrix<atom_t> C(n, n);
 
     A.init((float)(rand()) / (float)(rand()));
+    cudaDeviceSynchronize();
     B.init((float)(rand()) / (float)(rand()));
+    cudaDeviceSynchronize();
 
     for (auto _ : state) {
         C = A.view() * B.view();
+        cudaDeviceSynchronize();
         benchmark::DoNotOptimize(C.data());
-    }
-
-    std::vector<atom_t> hostA(n * n);
-    A.data().copy_to_host(hostA.data());
-    std::vector<atom_t> hostB(n * n);
-    B.data().copy_to_host(hostB.data());
-    std::vector<atom_t> hostC(n * n);
-    C.data().copy_to_host(hostC.data());
-
-    std::cout << "Matrix A from GPU:\n";
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            std::cout << hostA[i * n + j] << " ";
-        }
-        std::cout << "\n";
-    }
-
-    std::cout << "Matrix B from GPU:\n";
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            std::cout << hostB[i * 4 + j] << " ";
-        }
-        std::cout << "\n";
-    }
-
-    std::cout << "Matrix C from GPU:\n";
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            std::cout << hostC[i * 4 + j] << " ";
-        }
-        std::cout << "\n";
     }
 }
 
-BENCHMARK(BENCHMARK_matMul)->Name("matMulGPU")->RangeMultiplier(2)->Range(1 << 4, 1 << 5);
+BENCHMARK(BENCHMARK_matMul)->Name("matMulGPU")->RangeMultiplier(2)->Range(1 << 4, 1 << 10);
 
 BENCHMARK_MAIN();
