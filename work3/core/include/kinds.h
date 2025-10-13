@@ -4,9 +4,7 @@
 #include <concepts>
 
 template <typename T>
-concept AtomKind = std::convertible_to<T, double> || std::convertible_to<T, float> 
-                  || std::convertible_to<T, int> || std::same_as<T, float> 
-                  || std::same_as<T, double> || std::same_as<T, int>;
+concept AtomKind = std::integral<T> || std::floating_point<T>;
 
 // template <typename M>
 // concept MatrixKind = requires(M mtx, size_t i, size_t j) {

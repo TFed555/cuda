@@ -5,13 +5,12 @@
 int main() {
   using atom_t = float;
 
-  Matrix<atom_t> A(4,4);
-  Matrix<atom_t> B(4,4);
-  Matrix<atom_t> C(4,4);
-
+  Matrix<atom_t> A(4,4,4);
+  Matrix<atom_t> B(4,4,4);
+  Matrix<atom_t> C(4,4,4);
   
-  A.init(1.0f);
-  B.init(10.0f);
+  A.fill(1.0f);
+  B.fill(10.0f);
 
   C = A.view() * B.view();
   std::vector<atom_t> hostA(16);
