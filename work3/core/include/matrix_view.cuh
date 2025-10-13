@@ -11,7 +11,6 @@ class MatrixView {
     AtomT* data_;
     std::size_t nrows_; 
     std::size_t ncols_;
-    std::size_t stride_;
   public:
     __host__ __device__
     MatrixView(AtomT* data, std::size_t nrows, std::size_t ncols)
