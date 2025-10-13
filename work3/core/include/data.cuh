@@ -8,14 +8,13 @@ template <AtomKind AtomT>
 class Data {
 private:
   std::size_t size_;
-  std::size_t stride_;
   AtomT* data_;
 public:
-  Data(std::size_t size, std::size_t stride) : size_(size), stride_(stride), data_(nullptr) {
+  Data(std::size_t size) : size_(size), data_(nullptr) {
     cudaMalloc(&data_, size_*sizeof(AtomT));
   }
 
-  Data(const Data& other) : size_(other.size_), stride_(other.stride_), data_(nullptr) {
+  Data(const Data& other) : size_(other.size_), data_(nullptr) {
     cudaMalloc(&data_, size_*sizeof(AtomT));
     if (other.data_ != nullptr) {
       cudaMemcpy(data_, other.data_, size_*sizeof(AtomT), cudaMemcpyDeviceToDevice);
@@ -35,7 +34,6 @@ public:
     if (data_ != nullptr) {
       cudaFree(data_);
       size_ = obj.size_;
-      stride_ = obj.stride_;
       cudaMalloc(&data_, size_*sizeof(AtomT));
       
       if (obj.data_ != nullptr) {
@@ -54,10 +52,6 @@ public:
 
   std::size_t size() {
     return size_;
-  }
-
-  std::size_t stride() {
-    return stride_;
   }
 
   void copy_to_host(AtomT* host_ptr) {

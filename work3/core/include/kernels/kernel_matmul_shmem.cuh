@@ -8,16 +8,28 @@ __global__ void kernel_matmul_shmem(MatrixView<AtomT> a, MatrixView<AtomT> b,
                                 MatrixView<AtomT> res) {
   int blockRow = blockIdx.y;
   int blockCol = blockIdx.x;
-  //MatrixView<AtomT> resSub.get_submatrix(res, blockRow, blockCol);
-  Matrix<AtomT> res_sub(blockDim.y, blockDim.x, res.stride());
 
-  if (i < res.nrows() && j < res.ncols()) {
-    AtomT sum = 0;
-    for (int k = 0; k < a.ncols(); k++) {
-      sum += a(i, k) * b(k, j);
+  const int BLOCK_SIZE = 16;
+
+  AtomT sum = 0;
+  int row = threadIdx.y;
+  int col = threadIdx.x;
+
+  __shared__ AtomT a_sub_sh[BLOCK_SIZE][BLOCK_SIZE];
+  __shared__ AtomT b_sub_sh[BLOCK_SIZE][BLOCK_SIZE];
+
+  for (int k = 0; k < a.ncols()/BLOCK_SIZE; k++) {
+    a_sub_sh[row][col] = a(BLOCK_SIZE*blockRow + row, BLOCK_SIZE*k + col);
+    b_sub_sh[row][col] = b(BLOCK_SIZE*k + row, BLOCK_SIZE*blockCol + col);
+    __syncthreads();
+
+    for (int i = 0; i < BLOCK_SIZE; i++) {
+      sum += a_sub_sh[row][i] * b_sub_sh[i][col];
+      __syncthreads();
     }
-    res(i, j) = sum;
   }
+
+  res(BLOCK_SIZE*blockRow + row, BLOCK_SIZE*blockCol + col) = sum;
 }
 
 

@@ -13,13 +13,15 @@ class MatrixView {
     std::size_t ncols_;
     std::size_t stride_;
   public:
+    __host__ __device__
     MatrixView(AtomT* data, std::size_t nrows, std::size_t ncols, std::size_t stride)
     : data_(data), nrows_(nrows), ncols_(ncols), stride_(stride) {};
 
+    __host__ __device__
     ~MatrixView() {};
 
      __host__ __device__  std::size_t size() const { return nrows_ * ncols_; }
-      __host__ __device__  std::size_t stride() const { return stride_; }
+     __host__ __device__  std::size_t stride() const { return stride_; }
      __host__ __device__  std::size_t nrows() const { return nrows_; }
      __host__ __device__  std::size_t ncols() const { return ncols_; }
 
@@ -39,9 +41,6 @@ class MatrixView {
       return data_[i * stride_ + j];
     }
 
-    __device__ get_submatrix(MatrixView<AtomT> m, int row, int col) {
-      
-    }
 };
 
 #endif

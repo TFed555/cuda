@@ -15,7 +15,7 @@ class Matrix {
     //MatrixAccessor<AtomT> accessor_;
   public:
     Matrix(std::size_t nrows, std::size_t ncols, std::size_t stride)
-             : data_(std::make_shared<Data<AtomT>>(nrows * ncols, stride)),
+             : data_(std::make_shared<Data<AtomT>>(nrows * ncols)),
                 view_(data_->data(), nrows, ncols, stride)
     {};
 
@@ -36,6 +36,7 @@ class Matrix {
 
     MatrixView<AtomT>& view() { return view_; }
     const MatrixView<AtomT>& view() const { return view_; }
+
 };
 
 #endif

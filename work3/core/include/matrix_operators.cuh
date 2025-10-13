@@ -30,7 +30,7 @@ Matrix<AtomT> operator*(const MatrixView<AtomT>& a, const MatrixView<AtomT>& b){
   dim3 block_size(16, 16);
   dim3 grid_size = make_grid_2d(a.nrows(), a.ncols(), block_size);
 
-  kernel_matmul_shmem<<<grid_size, block_size>>>(a, b, res.view());
+  kernel_matmul_naive<<<grid_size, block_size>>>(a, b, res.view());
   cudaDeviceSynchronize();
 
   return res;
