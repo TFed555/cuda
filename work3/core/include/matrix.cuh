@@ -14,15 +14,14 @@ class Matrix {
     MatrixView<AtomT> view_;
     //MatrixAccessor<AtomT> accessor_;
   public:
-    Matrix(std::size_t nrows, std::size_t ncols, std::size_t stride)
+    Matrix(std::size_t nrows, std::size_t ncols)
              : data_(std::make_shared<Data<AtomT>>(nrows * ncols)),
-                view_(data_->data(), nrows, ncols, stride)
+                view_(data_->data(), nrows, ncols)
     {};
 
     std::size_t size() const { return view_.size(); }
     std::size_t nrows() const { return view_.nrows() ;}
     std::size_t ncols() const { return view_.ncols() ; }
-    std::size_t stride() const { return view_.stride(); }
 
     Data<AtomT>& data() { return *data_; }
     const Data<AtomT>& data() const { return *data_; }

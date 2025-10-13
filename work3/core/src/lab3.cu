@@ -5,19 +5,19 @@
 int main() {
   using atom_t = float;
 
-  Matrix<atom_t> A(4,4,4);
-  Matrix<atom_t> B(4,4,4);
-  Matrix<atom_t> C(4,4,4);
+  Matrix<atom_t> A(4,4);
+  Matrix<atom_t> B(4,4);
+  Matrix<atom_t> C(4,4);
   
   A.fill(1.0f);
   B.fill(10.0f);
 
   C = A.view() * B.view();
-  std::vector<atom_t> hostA(16);
+  std::vector<atom_t> hostA(64);
   A.data().copy_to_host(hostA.data());
-    std::vector<atom_t> hostB(16);
+  std::vector<atom_t> hostB(64);
   B.data().copy_to_host(hostB.data());
-  std::vector<atom_t> hostC(16);
+  std::vector<atom_t> hostC(64);
   C.data().copy_to_host(hostC.data());
 
     std::cout << "Matrix A from GPU:\n";

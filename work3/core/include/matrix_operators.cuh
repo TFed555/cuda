@@ -11,7 +11,7 @@
 template <AtomKind AtomT>
 Matrix<AtomT> operator+(const MatrixView<AtomT>& a, const MatrixView<AtomT>& b){
   if (a.size() != b.size()) { throw std::runtime_error("Not equal sizes"); }
-  Matrix<AtomT> res(a.nrows(), a.ncols(), a.stride());
+  Matrix<AtomT> res(a.nrows(), a.ncols());
 
   dim3 block_size(16, 16);
   dim3 grid_size = make_grid_2d(a.nrows(), a.ncols(), block_size);
@@ -25,12 +25,12 @@ Matrix<AtomT> operator+(const MatrixView<AtomT>& a, const MatrixView<AtomT>& b){
 template <AtomKind AtomT>
 Matrix<AtomT> operator*(const MatrixView<AtomT>& a, const MatrixView<AtomT>& b){
   if (a.ncols() != b.nrows()) { throw std::runtime_error("Can't multiply"); }
-  Matrix<AtomT> res(a.nrows(), b.ncols(), a.stride());
+  Matrix<AtomT> res(a.nrows(), b.ncols());
 
   dim3 block_size(16, 16);
   dim3 grid_size = make_grid_2d(a.nrows(), a.ncols(), block_size);
 
-  kernel_matmul_naive<<<grid_size, block_size>>>(a, b, res.view());
+  kernel_matmul_shmem<<<grid_size, block_size>>>(a, b, res.view());
   cudaDeviceSynchronize();
 
   return res;
@@ -38,7 +38,7 @@ Matrix<AtomT> operator*(const MatrixView<AtomT>& a, const MatrixView<AtomT>& b){
 
 template <AtomKind AtomT>
 Matrix<AtomT> operator*(const MatrixView<AtomT>& a, const AtomT val){
-  Matrix<AtomT> res(a.nrows(), a.ncols(), a.stride());
+  Matrix<AtomT> res(a.nrows(), a.ncols());
 
   dim3 block_size(16, 16);
   dim3 grid_size = make_grid_2d(a.nrows(), a.ncols(), block_size);
@@ -52,7 +52,7 @@ Matrix<AtomT> operator*(const MatrixView<AtomT>& a, const AtomT val){
 template <AtomKind AtomT>
 Matrix<AtomT> operator-(const MatrixView<AtomT>& a, const MatrixView<AtomT>& b){
   if (a.size() != b.size()) { throw std::runtime_error("Not equal sizes"); }
-  Matrix<AtomT> res(a.nrows(), a.ncols(), a.stride());
+  Matrix<AtomT> res(a.nrows(), a.ncols());
   Matrix<AtomT> b_neg = b * static_cast<AtomT>(-1);
   
   dim3 block_size(16, 16);
