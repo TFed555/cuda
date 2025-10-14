@@ -27,6 +27,7 @@ target_link_libraries(work3_core INTERFACE
 target_include_directories(work3_core INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/strategies
     ${CUDA_INCLUDE_DIRS}
 )
 
