@@ -18,8 +18,8 @@ FetchContent_MakeAvailable(googletest eigen)
 
 find_package(CUDAToolkit REQUIRED)
 
-set(SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/test1.cu
+file(GLOB_RECURSE SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu
 )
 
 add_executable(work2_tests ${SRC})
