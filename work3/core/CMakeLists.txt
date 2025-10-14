@@ -1,44 +1,33 @@
 cmake_minimum_required(VERSION 3.10)
-project(work2_core LANGUAGES CUDA CXX)
+project(work3_core LANGUAGES CUDA CXX)
 
 include(../cmake/config/cuda_arch.cmake)
 
 find_package(CUDA REQUIRED)
 
-file(GLOB_RECURSE SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
-)
+set(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_INCLUDES OFF)
+set(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_LIBRARIES OFF) 
+set(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_OBJECTS OFF)
 
-add_library(work2_core SHARED ${SRC})
-add_library(work2::core ALIAS work2_core)
+add_library(work3_core INTERFACE)
+add_library(work3::core ALIAS work3_core)
 
-set_target_properties(work2_core PROPERTIES
-    CUDA_RUNTIME_LIBRARY Shared
-    CUDA_SEPARABLE_COMPILATION ON
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/core
-    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/core
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/core
-)
-
-set_target_minimum_cuda_arch(work2_core 75)
-
-target_compile_features(work2_core PRIVATE
+target_compile_features(work3_core INTERFACE
     cuda_std_20
 )
 
-target_compile_options(work2_core PRIVATE
+target_compile_options(work3_core INTERFACE
     -Wall -O3 -Wno-deprecated-gpu-targets
 )
 
-target_link_libraries(work2_core PRIVATE
+target_link_libraries(work3_core INTERFACE
     ${CUDA_LIBRARIES}
 )
 
-target_include_directories(work2_core PUBLIC
+target_include_directories(work3_core INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/utils
     ${CUDA_INCLUDE_DIRS}
 )
 
-set_target_properties(work2_core PROPERTIES CUDA_ARCHITECTURES "75")
+set_target_properties(work3_core PROPERTIES CUDA_ARCHITECTURES "75")

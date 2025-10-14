@@ -1,5 +1,5 @@
 #include "matrix_operators.cuh"
-#include "kernels/kernel_matmul_naive.cuh"
+#include "kernels/kernel_matmul_shmem.cuh"
 #include "cuda_utils.cuh"
 #include "benchmark/benchmark.h"
 #include <iostream>
@@ -37,9 +37,9 @@ static void BENCHMARK_matMul(benchmark::State& state) {
     Matrix<atom_t> B(n, n);
     Matrix<atom_t> C(n, n);
 
-    A.init((float)(rand()) / (float)(rand()));
+    A.fill((float)(rand()) / (float)(rand()));
     cudaDeviceSynchronize();
-    B.init((float)(rand()) / (float)(rand()));
+    B.fill((float)(rand()) / (float)(rand()));
     cudaDeviceSynchronize();
 
     dim3 block_size(16, 16);
@@ -47,10 +47,11 @@ static void BENCHMARK_matMul(benchmark::State& state) {
 
     for (auto _ : state) {
         // C = A.view() * B.view();
-        kernel_matmul_naive<<<grid_size, block_size>>>(A.view(), B.view(), C.view());
+        kernel_matmul_shmem<<<grid_size, block_size>>>(A.view(), B.view(), C.view());
         cudaDeviceSynchronize();
         benchmark::DoNotOptimize(C.data());
     }
+    
 }
 
 BENCHMARK(BENCHMARK_matMul)->Name("matMulGPU")->RangeMultiplier(2)->Range(1 << 4, 1 << 10);
