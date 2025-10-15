@@ -25,7 +25,7 @@ def plot():
                   legend=dict(x=.5, xanchor="center"),
                   title="SpeedUp",
                   xaxis_title="Количество элементов в матрице",
-                  yaxis_title="Время выполнения(ns)",
+                  yaxis_title="Ускорение",
                   margin=dict(l=0, r=0, t=30, b=0))
 
     pyo.plot(fig, filename=path_output_file(), auto_open=True)
