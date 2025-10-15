@@ -10,7 +10,7 @@ public:
     void multiply(MatrixView<AtomT> a, MatrixView<AtomT> b, 
                                 MatrixView<AtomT> res) override {
         dim3 block_size(16, 16);
-        dim3 grid_size = make_grid_2d(a.nrows(), a.ncols(), block_size);
+        dim3 grid_size = make_grid_2d(res.nrows(), res.ncols(), block_size);
 
         kernel_matmul_shmem<<<grid_size, block_size>>>(a, b, res);
         cudaDeviceSynchronize();
