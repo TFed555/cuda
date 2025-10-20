@@ -17,7 +17,7 @@ target_compile_features(work3_core INTERFACE
 )
 
 target_compile_options(work3_core INTERFACE
-    -Wall -O3 -Wno-deprecated-gpu-targets
+    -Wall -O3 -Wno-deprecated-gpu-targets --generate-code=arch=compute_75,code=sm_75
 )
 
 target_link_libraries(work3_core INTERFACE
