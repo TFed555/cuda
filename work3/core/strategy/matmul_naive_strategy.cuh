@@ -5,7 +5,7 @@
 #include "../include/kernels/kernel_matmul_naive.cuh"
 
 template <AtomKind AtomT>
-class MatmulNaiveStrategy : public IMatmulStrategy<AtomT> {
+class MatmulNaiveStrategy : public MatmulStrategy<AtomT> {
 public:
     void multiply(MatrixView<AtomT> a, MatrixView<AtomT> b, 
                                 MatrixView<AtomT> res) override {

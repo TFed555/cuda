@@ -5,7 +5,7 @@
 #include "../include/kernels/kernel_matmul_shmem.cuh"
 
 template <AtomKind AtomT>
-class MatmulShmemStrategy : public IMatmulStrategy<AtomT> {
+class MatmulShmemStrategy : public MatmulStrategy<AtomT> {
 public:
     void multiply(MatrixView<AtomT> a, MatrixView<AtomT> b, 
                                 MatrixView<AtomT> res) override {

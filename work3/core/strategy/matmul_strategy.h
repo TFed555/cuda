@@ -7,12 +7,12 @@ template <AtomKind AtomT>
 class MatrixView;
 
 template <AtomKind AtomT>
-class IMatmulStrategy {
+class MatmulStrategy {
 public:
     virtual void multiply(MatrixView<AtomT> a, MatrixView<AtomT> b, 
                                 MatrixView<AtomT> res) = 0;
         
-    virtual ~IMatmulStrategy() = default;
+    virtual ~MatmulStrategy() = default;
 };
 
 #endif
