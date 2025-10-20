@@ -4,11 +4,17 @@ project(work3_tests LANGUAGES CXX CUDA)
 include(FetchContent)
 
 FetchContent_Declare(
+    eigen
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG 3.4.0
+)
+
+FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
     GIT_TAG release-1.12.1
 )
-FetchContent_MakeAvailable(googletest)
+FetchContent_MakeAvailable(googletest eigen)
 
 find_package(CUDAToolkit REQUIRED)
 
@@ -26,6 +32,7 @@ target_include_directories(work3_tests PRIVATE
     ${PROJECT_SOURCE_DIR}/core/include
     ${gtest_SOURCE_DIR}/include
     ${gtest_BINARY_DIR}/include
+    ${eigen_SOURCE_DIR}
 )
 
 target_link_libraries(work3_tests PRIVATE
