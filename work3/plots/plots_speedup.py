@@ -8,6 +8,8 @@ objs_matMulCPU_cur = list()
 objs_matMulGPU_cur = list()
 objs_matMulCPU_past = list()
 objs_matMulGPU_past = list()
+objs_matMulGPUDif = list()
+
 
 def read_file() -> dict:
     file_path = os.path.join(os.path.dirname(__file__), 'benchmark_results.json')
@@ -19,21 +21,16 @@ def read_file() -> dict:
             "past": data.get("benchmarks_past", [])
         }
 
+
 def plot():
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_matMulCPU_cur],
-                             y=[obj['real_time'] for obj in objs_matMulCPU_cur], name="CPU Eigen Current"))
     fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_matMulGPU_cur],
-                             y=[obj['real_time'] for obj in objs_matMulGPU_cur], name="GPU CUDA Current"))
-    fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_matMulCPU_past],
-                             y=[obj['real_time'] for obj in objs_matMulCPU_past], name="CPU Eigen Past"))
-    fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_matMulGPU_past],
-                             y=[obj['real_time'] for obj in objs_matMulGPU_past], name="GPU CUDA Past"))
+                             y=[obj['diff'] for obj in objs_matMulGPUDif], name="difference"))
     fig.update_layout(legend_orientation="h",
                   legend=dict(x=.5, xanchor="center"),
-                  title="Зависимость времени выполнения от количества элементов в матрице",
+                  title="SpeedUp",
                   xaxis_title="Количество элементов в матрице",
-                  yaxis_title="Время выполнения(ns)",
+                  yaxis_title="Ускорение",
                   margin=dict(l=0, r=0, t=30, b=0))
 
     pyo.plot(fig, filename=path_output_file(), auto_open=True)
@@ -41,7 +38,7 @@ def plot():
 
 def path_output_file():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    output_file = os.path.join(current_dir, "benchmark_plot.html")
+    output_file = os.path.join(current_dir, "benchmark_plot_speedup.html")
     return output_file
 
 
@@ -75,6 +72,9 @@ if __name__ == '__main__':
     past_benchmarks = list_obj["past"]
     parsing_json(current_benchmarks, is_cur=True)
     parsing_json(past_benchmarks, is_cur=False)
+    for obj in range(len(objs_matMulGPU_cur)):
+      obj_diff = {"diff": objs_matMulGPU_past[obj]["real_time"] / objs_matMulGPU_cur[obj]["real_time"]}
+      objs_matMulGPUDif.append(obj_diff)
     plot()
     # print(objs_GPUFull, end="\n")
     # print(objs_GPUCore, end="\n")
