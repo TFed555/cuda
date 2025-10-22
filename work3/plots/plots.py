@@ -4,9 +4,7 @@ import plotly.offline as pyo
 import os
 import sys
 
-objs_matMulCPU_cur = list()
 objs_matMulGPU_cur = list()
-objs_matMulCPU_past = list()
 objs_matMulGPU_past = list()
 
 def read_file() -> dict:
@@ -21,14 +19,10 @@ def read_file() -> dict:
 
 def plot():
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_matMulCPU_cur],
-                             y=[obj['real_time'] for obj in objs_matMulCPU_cur], name="CPU Eigen Current"))
     fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_matMulGPU_cur],
-                             y=[obj['real_time'] for obj in objs_matMulGPU_cur], name="GPU CUDA Current"))
-    fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_matMulCPU_past],
-                             y=[obj['real_time'] for obj in objs_matMulCPU_past], name="CPU Eigen Past"))
+                             y=[obj['real_time'] for obj in objs_matMulGPU_cur], name="GPU CUDA Shmem"))
     fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_matMulGPU_past],
-                             y=[obj['real_time'] for obj in objs_matMulGPU_past], name="GPU CUDA Past"))
+                             y=[obj['real_time'] for obj in objs_matMulGPU_past], name="GPU CUDA Naive"))
     fig.update_layout(legend_orientation="h",
                   legend=dict(x=.5, xanchor="center"),
                   title="Зависимость времени выполнения от количества элементов в матрице",
@@ -47,17 +41,7 @@ def path_output_file():
 
 def parsing_json(list_obj, is_cur=True):
     for obj in list_obj:
-        if "matMulCPU" in obj["name"]:
-            obj_CPU = {
-                "name": (obj["name"].split("/"))[0], 
-                "number_elements": (obj["name"].split("/"))[1], 
-                "real_time": obj["real_time"]
-            }
-            if is_cur:
-                objs_matMulCPU_cur.append(obj_CPU)
-            else:
-                objs_matMulCPU_past.append(obj_CPU)
-        elif "matMulGPU" in obj["name"]:
+        if "matMulGPU" in obj["name"]:
             obj_GPU = {
                 "name": (obj["name"].split("/"))[0], 
                 "number_elements": (obj["name"].split("/"))[1], 
