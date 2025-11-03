@@ -7,23 +7,21 @@
 #include "matrix_view.cuh"
 #include <memory>
 
-template<AtomKind AtomT>
+template<AtomKind AtomT, typename Strategy>
 class Matrix {
   private:
     std::shared_ptr<Data<AtomT>> data_;
     MatrixView<AtomT> view_;
-    MatmulStrategy<AtomT>* strategy_;
+    Strategy strategy_;
   public:
     Matrix(std::size_t nrows, std::size_t ncols)
              : data_(std::make_shared<Data<AtomT>>(nrows * ncols)),
-                view_(data_->data(), nrows, ncols),
-                strategy_(nullptr)
+                view_(data_->data(), nrows, ncols)
     {};
 
     std::size_t size() const { return view_.size(); }
     std::size_t nrows() const { return view_.nrows() ;}
     std::size_t ncols() const { return view_.ncols() ; }
-    MatmulStrategy<AtomT>* strategy() const { return strategy_ ;}
 
     Data<AtomT>& data() { return *data_; }
     const Data<AtomT>& data() const { return *data_; }
@@ -38,9 +36,6 @@ class Matrix {
     MatrixView<AtomT>& view() { return view_; }
     const MatrixView<AtomT>& view() const { return view_; }
 
-    void set_strategy(MatmulStrategy<AtomT>* strategy) {
-      strategy_ = strategy;
-    }
 };
 
 #endif

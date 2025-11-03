@@ -3,14 +3,15 @@
 
 #include "../include/kinds.h"
 
-template <AtomKind AtomT>
+template <AtomKind AtomA>
 class MatrixView;
 
-template <AtomKind AtomT>
+template <AtomKind AtomA, AtomKind AtomC>
 class MatmulStrategy {
 public:
-    virtual void multiply(MatrixView<AtomT> a, MatrixView<AtomT> b, 
-                                MatrixView<AtomT> res) = 0;
+    using Output = AtomC;
+    virtual void multiply(MatrixView<AtomA> a, MatrixView<AtomA> b, 
+                                MatrixView<AtomC> res) = 0;
         
     virtual ~MatmulStrategy() = default;
 };

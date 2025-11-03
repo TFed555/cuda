@@ -39,6 +39,9 @@ class MatrixView {
       return data_[i * ncols_ + j];
     }
 
+    __host__ __device__ AtomT* data() { return data_; }
+    __host__ __device__ AtomT* data() const { return data_; }
+
 };
 
 #endif
