@@ -8,9 +8,9 @@
 using Eigen::MatrixXf;
 
 int main() {
-  int M = 2;
-  int N = 2;
-  int K = 2;  
+  int M = 16;
+  int N = 16;
+  int K = 16;  
   int hostN_A = M*K;
   int hostN_B = K*N;
   int hostN_C = M*N;
