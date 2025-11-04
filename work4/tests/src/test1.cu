@@ -45,7 +45,7 @@ int main() {
     std::cout << "Matrix B from GPU:\n";
     for (int i = 0; i < K; ++i) {
         for (int j = 0; j < N; ++j) {
-            std::cout << __half2float(hostB[i * K + j]) << " ";
+            std::cout << __half2float(hostB[i * N + j]) << " ";
         }
         std::cout << "\n";
   }
@@ -53,7 +53,7 @@ int main() {
   std::cout << "Matrix C from GPU:\n";
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < N; ++j) {
-            std::cout << __half2float(hostC[i * K + j]) << " ";
+            std::cout << __half2float(hostC[i * N + j]) << " ";
         }
         std::cout << "\n";
   }
