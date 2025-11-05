@@ -9,8 +9,8 @@ class MatmulWmmaStrategy : public MatmulStrategy<AtomA, AtomC>  {
 public:
     void multiply(MatrixView<AtomA> a, MatrixView<AtomA> b, 
                                 MatrixView<AtomC> res) override {
-        dim3 block_size(16, 16);
-        dim3 grid_size = make_grid_2d(res.nrows(), res.ncols(), block_size);
+        dim3 block_size(128, 4);
+        dim3 grid_size = make_wmma_grid_2d(res.nrows(), res.ncols(), block_size);
 
         kernel_matmul_wmma<<<grid_size, block_size>>>(a, b, res);
         cudaDeviceSynchronize();

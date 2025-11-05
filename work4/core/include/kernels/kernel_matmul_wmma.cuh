@@ -14,8 +14,7 @@ __global__ void kernel_matmul_wmma(MatrixView<AtomA> a, MatrixView<AtomA> b,
     const int WMMA_M = 16;
     const int WMMA_N = 16;
     const int WMMA_K = 16;
-    const float alpha = 1.0f;
-    const float beta = 0.0f;
+    const int warpSize = 32;
 
     int m = a.nrows();
     int n = b.ncols();
@@ -23,7 +22,7 @@ __global__ void kernel_matmul_wmma(MatrixView<AtomA> a, MatrixView<AtomA> b,
 
     int lda = k;
     int ldb = k;
-    int ldc = b.ncols();
+    int ldc = n;
 
     int warpM = (blockIdx.x * blockDim.x + threadIdx.x) / warpSize;
     int warpN = (blockIdx.y * blockDim.y + threadIdx.y);
@@ -31,7 +30,6 @@ __global__ void kernel_matmul_wmma(MatrixView<AtomA> a, MatrixView<AtomA> b,
     wmma::fragment<wmma::matrix_a,WMMA_M, WMMA_N, WMMA_K, half, wmma::row_major> a_frag;
     wmma::fragment<wmma::matrix_b, WMMA_M, WMMA_N, WMMA_K, half, wmma::col_major> b_frag;
     wmma::fragment<wmma::accumulator, WMMA_M, WMMA_N, WMMA_K, float> acc_frag;
-    wmma::fragment<wmma::accumulator, WMMA_M, WMMA_N, WMMA_K, float> c_frag;
 
     wmma::fill_fragment(acc_frag, 0.0f);
 
@@ -44,22 +42,18 @@ __global__ void kernel_matmul_wmma(MatrixView<AtomA> a, MatrixView<AtomA> b,
       if (rowA < m && colA < k && rowB < k && colB < n) {
         half* a_tile_ptr = a.data() + colA + rowA * lda;
         wmma::load_matrix_sync(a_frag, a_tile_ptr, lda);
-        half* b_tile_ptr = b.data() + rowB + colB * ldb;
+        half* b_tile_ptr = b.data() + colB * ldb + rowB;
         wmma::load_matrix_sync(b_frag, b_tile_ptr, ldb);
 
         wmma::mma_sync(acc_frag, a_frag, b_frag, acc_frag);
       }
     }
 
-    int rowC = warpM * WMMA_M;
-    int colC = warpN * WMMA_N;
+    int rowC = rowA;
+    int colC = colB;
 
     if (rowC < m && colC < n) {
-       wmma::load_matrix_sync(c_frag, res.data() + colC + rowC * ldc, ldc, wmma::mem_row_major);
-        for (int i = 0; i < c_frag.num_elements; i++) {
-            c_frag.x[i] = alpha * acc_frag.x[i] + beta * c_frag.x[i];
-        }
-       wmma::store_matrix_sync(res.data() + colC + rowC * ldc, c_frag, ldc, wmma::mem_row_major);
+       wmma::store_matrix_sync(res.data() + colC + rowC * ldc, acc_frag, ldc, wmma::mem_row_major);
     }
 } 
 
