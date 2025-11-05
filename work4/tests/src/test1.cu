@@ -7,56 +7,100 @@
 #include <Eigen/Dense>
 using Eigen::MatrixXf;
 
-int main() {
-  int M = 16;
-  int N = 16;
-  int K = 16;  
-  int hostN_A = M*K;
-  int hostN_B = K*N;
-  int hostN_C = M*N;
+using Wmma = MatmulWmmaStrategy<half, float>;
 
-  using Naive = MatmulNaiveStrategy<half, half>;
-  using Wmma = MatmulWmmaStrategy<half, float>;
-
-  Matrix<half, Wmma> A(M,K);
-  Matrix<half, Wmma> B(K,N);
-  Matrix<float, Wmma> C(M,N);
+class MatrixTest : public ::testing::Test { };
+MatrixXf convertOurMatrix(::Matrix<float, Wmma>& mat, int rows, int cols) {
+  std::vector<float> host_data(rows * cols);
+  mat.data().copy_to_host(host_data.data());
   
-  A.fill(1.0f);
-  B.fill(10.0f);
-
-  C = A * B;
-  std::vector<half> hostA(hostN_A);
-  A.data().copy_to_host(hostA.data());
-  std::vector<half> hostB(hostN_B);
-  B.data().copy_to_host(hostB.data());
-  std::vector<float> hostC(hostN_C);
-  C.data().copy_to_host(hostC.data());
-
-
-    std::cout << "Matrix A from GPU:\n";
-    for (int i = 0; i < M; ++i) {
-        for (int j = 0; j < K; ++j) {
-            std::cout << __half2float(hostA[i * K + j]) << " ";
-        }
-        std::cout << "\n";
+  MatrixXf result(rows, cols);
+  for (int i = 0; i < rows; ++i) {
+    for (int j = 0; j < cols; ++j) {
+      result(i, j) = host_data[i * cols + j];
+    }
   }
+  return result;
+}
 
-    std::cout << "Matrix B from GPU:\n";
-    for (int i = 0; i < K; ++i) {
-        for (int j = 0; j < N; ++j) {
-            std::cout << __half2float(hostB[i * N + j]) << " ";
-        }
-        std::cout << "\n";
+MatrixXf convertEigenMatrix(const Eigen::Matrix<Eigen::half, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& mat) {
+  MatrixXf result(mat.rows(), mat.cols());
+  for (int i = 0; i < mat.rows(); ++i) {
+    for (int j = 0; j < mat.cols(); ++j) {
+      result(i, j) = static_cast<float>(mat(i, j));
+    }
   }
+  return result;
+}
 
-  std::cout << "Matrix C from GPU:\n";
-    for (int i = 0; i < M; ++i) {
-        for (int j = 0; j < N; ++j) {
-            std::cout << __half2float(hostC[i * N + j]) << " ";
-        }
-        std::cout << "\n";
+TEST_F(MatrixTest, MultiMatrixSmallSize) {
+  const std::vector<int> sizes = {16, 32, 64};
+  const float val = 2.0f;
+    
+  for (size_t i = 0; i < sizes.size(); ++i) {
+    int m = sizes[i];
+    for (size_t j = 0; j < sizes.size(); ++j) {
+      int k = sizes[j];
+      for (size_t l = 0; l < sizes.size(); ++l) {
+        int n = sizes[l];
+
+        ::Matrix<half, Wmma> a(m, k);
+        ::Matrix<half, Wmma> b(k, n);
+
+        a.fill(val);
+        b.fill(val);
+
+        ::Matrix<float, Wmma> res = a * b;
+
+        Eigen::Matrix<Eigen::half, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen_a(m, k);
+        Eigen::Matrix<Eigen::half, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen_b(k, n);
+
+        eigen_a.setConstant(Eigen::half(val));
+        eigen_b.setConstant(Eigen::half(val));
+
+        auto eigen_res = eigen_a * eigen_b;
+
+        MatrixXf res_final = convertOurMatrix(res, m, n);
+        MatrixXf expected = convertEigenMatrix(eigen_res);
+
+        EXPECT_TRUE(res_final.isApprox(expected, 1e-2f));
+      }
+    }
   }
+}
 
-  return 0;
+TEST_F(MatrixTest, MultiMatrixBigSize) {
+  const std::vector<int> sizes = {128, 256, 512, 1024};
+  const float val = 2.0f;
+  
+  for (size_t i = 0; i < sizes.size(); ++i) {
+    int m = sizes[i];
+    for (size_t j = 0; j < sizes.size(); ++j) {
+      int k = sizes[j];
+      for (size_t l = 0; l < sizes.size(); ++l) {
+        int n = sizes[l];
+
+        ::Matrix<half, Wmma> a(m, k);
+        ::Matrix<half, Wmma> b(k, n);
+
+        a.fill(val);
+        b.fill(val);
+
+        ::Matrix<float, Wmma> res = a * b;
+
+        Eigen::Matrix<Eigen::half, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen_a(m, k);
+        Eigen::Matrix<Eigen::half, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen_b(k, n);
+
+        eigen_a.setConstant(Eigen::half(val));
+        eigen_b.setConstant(Eigen::half(val));
+
+        auto eigen_res = eigen_a * eigen_b;
+
+        MatrixXf res_final = convertOurMatrix(res, m, n);
+        MatrixXf expected = convertEigenMatrix(eigen_res);
+
+        EXPECT_TRUE(res_final.isApprox(expected, 1e-2f));
+      }
+    }
+  }
 }

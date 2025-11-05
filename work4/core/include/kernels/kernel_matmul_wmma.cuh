@@ -14,14 +14,15 @@ __global__ void kernel_matmul_wmma(MatrixView<AtomA> a, MatrixView<AtomA> b,
     const int WMMA_M = 16;
     const int WMMA_N = 16;
     const int WMMA_K = 16;
+    const int warpSize = 32;
 
     int m = a.nrows();
     int n = b.ncols();
     int k = a.ncols();
 
     int lda = k;
-    int ldb = n;
-    int ldc = n;
+    int ldb = k;
+    int ldc = b.ncols();
 
     int warpM = blockIdx.x;
     int warpN = blockIdx.y;

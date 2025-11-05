@@ -28,7 +28,7 @@ class Matrix {
 
     void fill(AtomT val) {
       dim3 block(16, 16);
-      dim3 grid = make_grid_2d(nrows(), ncols(), block);
+      dim3 grid = cuda_utils::make_grid_2d(nrows(), ncols(), block);
       kernel_matrix_fill<<<grid, block>>>(view_, val);
       cudaDeviceSynchronize();
     }
