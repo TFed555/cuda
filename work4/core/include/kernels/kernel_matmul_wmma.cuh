@@ -28,7 +28,7 @@ __global__ void kernel_matmul_wmma(MatrixView<AtomA> a, MatrixView<AtomA> b,
     int warpN = (blockIdx.y * blockDim.y + threadIdx.y);
 
     wmma::fragment<wmma::matrix_a,WMMA_M, WMMA_N, WMMA_K, half, wmma::row_major> a_frag;
-    wmma::fragment<wmma::matrix_b, WMMA_M, WMMA_N, WMMA_K, half, wmma::col_major> b_frag;
+    wmma::fragment<wmma::matrix_b, WMMA_M, WMMA_N, WMMA_K, half, wmma::row_major> b_frag;
     wmma::fragment<wmma::accumulator, WMMA_M, WMMA_N, WMMA_K, float> acc_frag;
 
     wmma::fill_fragment(acc_frag, 0.0f);
@@ -42,7 +42,7 @@ __global__ void kernel_matmul_wmma(MatrixView<AtomA> a, MatrixView<AtomA> b,
       if (rowA < m && colA < k && rowB < k && colB < n) {
         half* a_tile_ptr = a.data() + colA + rowA * lda;
         wmma::load_matrix_sync(a_frag, a_tile_ptr, lda);
-        half* b_tile_ptr = b.data() + colB * ldb + rowB;
+        half* b_tile_ptr = b.data() + rowB + colB * ldb;
         wmma::load_matrix_sync(b_frag, b_tile_ptr, ldb);
 
         wmma::mma_sync(acc_frag, a_frag, b_frag, acc_frag);
