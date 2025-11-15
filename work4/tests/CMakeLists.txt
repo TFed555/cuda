@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(work3_tests LANGUAGES CXX CUDA)
+project(work4_tests LANGUAGES CXX CUDA)
 
 include(FetchContent)
 
@@ -22,30 +22,30 @@ file(GLOB_RECURSE SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu
 )
 
-add_executable(work3_tests ${SRC})
+add_executable(work4_tests ${SRC})
 
 
-target_compile_features(work3_tests PRIVATE cxx_std_20)
-target_compile_options(work3_tests PRIVATE -Wall -O3)
+target_compile_features(work4_tests PRIVATE cxx_std_20)
+target_compile_options(work4_tests PRIVATE -Wall -O3)
 
-target_include_directories(work3_tests PRIVATE
+target_include_directories(work4_tests PRIVATE
     ${PROJECT_SOURCE_DIR}/core/include
     ${gtest_SOURCE_DIR}/include
     ${gtest_BINARY_DIR}/include
     ${eigen_SOURCE_DIR}
 )
 
-target_link_libraries(work3_tests PRIVATE
-    work3::core
+target_link_libraries(work4_tests PRIVATE
+    work4::core
     CUDA::cudart
     GTest::gtest_main
 )
 
 enable_testing()
-add_test(NAME work3_tests COMMAND work3_tests)
+add_test(NAME work4_tests COMMAND work4_tests)
 
-set_target_properties(work3_tests PROPERTIES
+set_target_properties(work4_tests PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests
 )
 
-set_target_properties(work3_core PROPERTIES CUDA_ARCHITECTURES "75")
+set_target_properties(work4_core PROPERTIES CUDA_ARCHITECTURES "75")

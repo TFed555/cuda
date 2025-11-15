@@ -23,19 +23,19 @@ file(GLOB_RECURSE CUDA_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu
 )
 
-add_executable(work3_benchmarks ${CUDA_SRC})
+add_executable(work4_benchmarks ${CUDA_SRC})
 
-set_target_minimum_cuda_arch(work3_benchmarks 75)
+set_target_minimum_cuda_arch(work4_benchmarks 75)
 
-target_compile_features(work3_benchmarks PRIVATE cxx_std_20)
-target_compile_options(work3_benchmarks PRIVATE -Wall -O3)
+target_compile_features(work4_benchmarks PRIVATE cxx_std_20)
+target_compile_options(work4_benchmarks PRIVATE -Wall -O3)
 
-target_compile_options(work3_benchmarks PRIVATE
+target_compile_options(work4_benchmarks PRIVATE
     $<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe --diag_suppress=2739>
     $<$<COMPILE_LANGUAGE:CXX>:-Wno-unknown-pragmas>
 )
 
-target_include_directories(work3_benchmarks PRIVATE
+target_include_directories(work4_benchmarks PRIVATE
     ${PROJECT_SOURCE_DIR}/core/include
     ${PROJECT_SOURCE_DIR}/core/utils
     ${benchmark_SOURCE_DIR}/include
@@ -43,23 +43,23 @@ target_include_directories(work3_benchmarks PRIVATE
     ${eigen_SOURCE_DIR}
 )
 
-target_link_libraries(work3_benchmarks PRIVATE
-    work3::core
+target_link_libraries(work4_benchmarks PRIVATE
+    work4::core
     CUDA::cudart
     benchmark::benchmark
 )
 
-set_target_properties(work3_benchmarks PROPERTIES
+set_target_properties(work4_benchmarks PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/benchmarks
 )
 
-set_target_properties(work3_benchmarks PROPERTIES CUDA_ARCHITECTURES "75")
+set_target_properties(work4_benchmarks PROPERTIES CUDA_ARCHITECTURES "75")
 
 add_custom_target(run_benchmarks_json
-    COMMAND work3_benchmarks
+    COMMAND work4_benchmarks
         --benchmark_format=json > ${CMAKE_BINARY_DIR}/../plots/benchmark_results.json
         --benchmark_out_format=json
-    DEPENDS work3_benchmarks
+    DEPENDS work4_benchmarks
     COMMENT "Running benchmarks with JSON output"
     VERBATIM
 )
