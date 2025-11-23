@@ -10,6 +10,3 @@ if(ENABLE_TESTS)
     add_subdirectory(tests)
 endif()
 
-if(ENABLE_BENCH)
-    add_subdirectory(benchmarks)
-endif()

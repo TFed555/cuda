@@ -12,6 +12,11 @@ public:
         dim3 grid_size = dim3((a.size() + block.x - 1) / block.x);
 
         kernel_vecred_nobr<<<grid_size, block_size>>>(a, res);
+        
+        cudaError_t errSync  = cudaGetLastError();
+        if (errSync != cudaSuccess) {
+            printf("Sync kernel error: %s\n", cudaGetErrorString(errSync));
+        }
         cudaDeviceSynchronize();
     }
 };

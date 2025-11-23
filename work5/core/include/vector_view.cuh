@@ -5,12 +5,13 @@
 
 template <AtomKind AtomT>
 class VectorView {
+  using atom_t = AtomT;
   private:
-    AtomT* data_;
+    atom_t* data_;
     std::size_t size_;
   public:
-    __host__ __device_  _
-    VectorView(AtomT* data, std::size_t size) : data_(data),
+    __host__ __device__
+    VectorView(atom_t* data, std::size_t size) : data_(data),
               size_(size)
     {};
 
@@ -34,3 +35,5 @@ class VectorView {
       return data_[i];
     }
 }
+
+#endif

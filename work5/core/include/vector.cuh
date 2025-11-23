@@ -28,4 +28,8 @@ class Vector {
       kernel_vector_fill<<<grid, block>>>(view_, val);
       cudaDeviceSynchronize();
     }
+
+    AtomT sum();
 }
+
+#endif

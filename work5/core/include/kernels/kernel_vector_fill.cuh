@@ -1,7 +1,6 @@
 #ifndef KERNEL_VECTOR_FILL
 #define KERNEL_VECTOR_FILL
 
-#include "kinds.h"
 #include "../vector_view.cuh"
 
 template <AtomKind AtomT>
