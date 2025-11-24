@@ -5,13 +5,14 @@
 #include "../include/kernels/kernel_vecred_nobr.cuh"
 
 template <AtomKind AtomT>
-class VecsumNobrStrategy : public VecsumStrategy<VecsumNobrStrategy<AtomT>, AtomT> {
+class VecsumNobrStrategy : public VecsumStrategy<VecsumNobrStrategy, AtomT> {
 public:
-    void addImpl(VectorView<AtomT> a, AtomT res) const {
-        dim3 block_size(16, 16);
-        dim3 grid_size = dim3((a.size() + block_size.x - 1) / block_size.x);
+    static void addImpl(VectorView<AtomT> a, AtomT* res) {
+        constexpr std::size_t block_size = 256;
+        std::size_t grid_size = (a.size() + block_size - 1) / block_size;
+        std::size_t shm = block_size * sizeof(AtomT);
 
-        kernel_vecred_nobr<<<grid_size, block_size>>>(a, res);
+        kernel_vecred_nobr<<<grid_size, block_size, shm>>>(a, res);
         
         cudaError_t errSync  = cudaGetLastError();
         if (errSync != cudaSuccess) {

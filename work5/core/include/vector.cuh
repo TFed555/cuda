@@ -5,7 +5,7 @@
 #include <memory>
 
 
-template <AtomKind AtomT, template<AtomKind> typename Strategy>
+template <AtomKind AtomT, template<typename> typename Strategy>
 class Vector {
   private:
     std::shared_ptr<Data<AtomT>> data_;

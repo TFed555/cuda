@@ -6,11 +6,11 @@
 template <AtomKind AtomT>
 class VectorView;
 
-template <typename Strategy, AtomKind AtomT>
+template <template<AtomKind> class Derived, AtomKind AtomT>
 class VecsumStrategy {
 public:
-    void add(VectorView<AtomT> a, AtomT res) const {
-       return static_cast<const Strategy*>(this)->addImpl(a, res);
+    static void add(VectorView<AtomT> a, AtomT* res) {
+       Derived<AtomT>::addImpl(a, res);
     }
 };
 

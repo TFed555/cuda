@@ -15,7 +15,7 @@ int main() {
 
   result = A.sum();
   
-  std::cout << result;
+  std::cout << "Result " << result;
 
   return 0;
 }
