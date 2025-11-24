@@ -2,14 +2,15 @@
 #define VECTOR_OPERATIONS_CUH
 
 #include "vector.cuh"
+#include "../strategy/vecsum_strategy.h"
 
-template <AtomKind AtomT, typename Strategy>
-AtomT Vector::sum() {
+template <AtomKind AtomT, template<AtomKind> typename Strategy>
+AtomT Vector<AtomT, Strategy>::sum() {
     Data<AtomT> res_device;
     AtomT res_host = 0;
     res_device.copy_to_device(&res_host);
 
-    Strategy::add(view(), res_device.data());
+    Strategy<AtomT>::add(view(), res_device.data());
     
     cudaError_t errSync  = cudaGetLastError();
     if (errSync != cudaSuccess) {
@@ -18,7 +19,7 @@ AtomT Vector::sum() {
     cudaDeviceSynchronize();
     res_device.copy_to_host(&res_host);
 
-    return result;
+    return res_host;
 };
 
 #endif

@@ -34,6 +34,6 @@ class VectorView {
     __host__ __device__ const atom_t& operator() (std::size_t i, std::size_t j) const {
       return data_[i];
     }
-}
+};
 
 #endif

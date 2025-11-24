@@ -4,7 +4,8 @@
 #include "kernels/kernel_vector_fill.cuh"
 #include <memory>
 
-template <AtomKind AtomT, typename Strategy>
+
+template <AtomKind AtomT, template<AtomKind> typename Strategy>
 class Vector {
   private:
     std::shared_ptr<Data<AtomT>> data_;
@@ -17,19 +18,19 @@ class Vector {
     std::size_t size() const { return view_.size(); }
 
     Data<AtomT>& data() { return *data_; }
-    const Data<AtomT>& data() const { return *data; }
+    const Data<AtomT>& data() const { return *data_; }
 
     VectorView<AtomT>& view() { return view_; }
     const VectorView<AtomT>& view() const { return view_; }
 
     void fill(AtomT val) {
       dim3 block(16, 16);
-      dim3 grid = cuda_utils::make_grid_2d(nrows(), ncols(), block);
+      dim3 grid = dim3((size() + dim3(16, 16).x - 1) / dim3(16, 16).x);
       kernel_vector_fill<<<grid, block>>>(view_, val);
       cudaDeviceSynchronize();
     }
 
     AtomT sum();
-}
+};
 
 #endif

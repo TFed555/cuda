@@ -8,9 +8,8 @@
 int main() {
   using atom_t = float;
   int M = 3;
-  VecsumNobrStrategy nobr;
   atom_t result;
-  Vector<atom_t, nobr> A(M);
+  Vector<atom_t, VecsumNobrStrategy> A(M);
   
   A.fill(1.0f);
 
