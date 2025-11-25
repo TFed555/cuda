@@ -1,6 +1,7 @@
 #include <iostream>
 #include "vector_operations.cuh"
 #include "../strategy/vecsum_nobr_strategy.cuh"
+#include "../strategy/vecsum_br_strategy.cuh"
 #include <vector>
 
 
