@@ -8,7 +8,7 @@
 //пример
 int main() {
   using atom_t = float;
-  int M = 2;
+  int M = 1039;
   atom_t result;
   Vector<atom_t, VecsumBrStrategy> A(M);
   

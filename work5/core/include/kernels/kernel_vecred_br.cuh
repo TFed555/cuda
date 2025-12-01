@@ -6,7 +6,7 @@
 template <AtomKind AtomT>
 __device__ inline AtomT warp_reduce(AtomT value) {
   #pragma unroll
-    for (unsigned int j = warpSize/2; j >= 1; j /= 2) {
+    for (int j = warpSize/2; j > 0; j /= 2) {
         value += __shfl_down_sync(0xffffffff, value, j, 32);
     }
     return value;
