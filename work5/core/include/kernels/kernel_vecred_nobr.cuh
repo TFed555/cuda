@@ -9,7 +9,7 @@ __global__ void kernel_vecred_nobr(VectorView<AtomT> a, AtomT* res) {
     extern __shared__ AtomT sh[];
 
     std::size_t tid = threadIdx.x;
-    std::size_t t = blockIdx.x * blockDim.x + threadIdx.x;
+    std::size_t t = blockIdx.x * blockDim.x + tid;
 
     //printf("%llu %llu \n", tid, t);
 
@@ -19,6 +19,7 @@ __global__ void kernel_vecred_nobr(VectorView<AtomT> a, AtomT* res) {
 
     __syncthreads();
 
+    #pragma unroll
     for (std::size_t i = blockDim.x/2; i>0; i/=2) {
         if (tid < i) {
           sh[tid] += sh[tid + i];

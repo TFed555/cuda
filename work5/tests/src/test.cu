@@ -8,9 +8,9 @@
 //пример
 int main() {
   using atom_t = float;
-  int M = 3;
+  int M = 2;
   atom_t result;
-  Vector<atom_t, VecsumNobrStrategy> A(M);
+  Vector<atom_t, VecsumBrStrategy> A(M);
   
   A.fill(1.0f);
 

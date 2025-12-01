@@ -4,30 +4,47 @@
 #include "../vector_view.cuh"
 
 template <AtomKind AtomT>
+__device__ inline AtomT warp_reduce(AtomT value) {
+  #pragma unroll
+    for (unsigned int j = warpSize/2; j >= 1; j /= 2) {
+        value += __shfl_down_sync(0xffffffff, value, j, 32);
+    }
+    return value;
+}
+
+template <AtomKind AtomT>
 __global__ void kernel_vecred_br(VectorView<AtomT> a, AtomT* res) {
 
     extern __shared__ AtomT sh[];
 
     std::size_t tid = threadIdx.x;
-    std::size_t t = blockIdx.x * blockDim.x + threadIdx.x;
+    std::size_t t = blockIdx.x * blockDim.x + tid;
+    std::size_t laneId = tid % warpSize;
+    std::size_t warpId = tid / warpSize;
 
-    sh[tid] = (t < a.size()) ? a[t] : 0;
+    AtomT value = 0;
+    if (t < a.size()) {
+      value = a[t];
+    }
 
-    printf("%llu sh %f \n", tid, sh[tid]);
+    value = warp_reduce(value);
+
+    if (laneId == 0) {
+      sh[warpId] = value;
+     // printf("%llu sh %f \n", warpId, sh[warpId]);
+    }
 
     __syncthreads();
 
-    for (std::size_t i = blockDim.x/2; i>0; i/=2) {
-        if (tid < i) {
-          sh[tid] += sh[tid + i];
-          printf("%llu sh2 %f \n", tid, sh[tid]);
+    if (warpId == 0){
+        int num_warps = blockDim.x / warpSize;
+       // printf("%llu ss %d \n", laneId, num_warps);
+        value = laneId < num_warps ? sh[laneId] : 0;
+        value = warp_reduce(value);
+       // printf("%llu shd bratik %f \n", laneId, value);
+        if (laneId == 0) {
+            atomicAdd(res, value);
         }
-        __syncthreads();
-    }
-
-    if (tid == 0){
-        printf("%llu res %f \n", tid, sh[0]);
-        atomicAdd(res, sh[0]);
     }
 }
 
