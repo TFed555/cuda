@@ -4,23 +4,30 @@
 #include "../vector_view.cuh"
 
 template <AtomKind AtomT>
-__global__ void kernel_vecred_nobr(VectorView<AtomT> a, AtomT* res) {
+__global__ void kernel_vecred_nobr(VectorView<AtomT> a, AtomT* blockSum) {
 
     extern __shared__ AtomT sh[];
 
     std::size_t tid = threadIdx.x;
-    std::size_t t = blockIdx.x * blockDim.x + tid;
+    std::size_t blockSize = blockDim.x;
+    //std::size_t t = blockIdx.x * blockDim.x + tid;
 
     //printf("%llu %llu \n", tid, t);
 
-    sh[tid] = (t < a.size()) ? a[t] : 0;
+    double sum = static_cast<double>(0);
+
+    for (size_t j = blockIdx.x * blockDim.x + tid; j < a.size(); j += gridDim.x * blockDim.x) {
+      sum += static_cast<double>(a[j]);
+    }
+
+    sh[tid] = static_cast<AtomT>(sum);
 
     //printf("%llu sh %f \n", tid, sh[tid]);
 
     __syncthreads();
 
     #pragma unroll
-    for (std::size_t i = blockDim.x/2; i>0; i/=2) {
+    for (std::size_t i = blockSize/2; i>0; i/=2) {
         if (tid < i) {
           sh[tid] += sh[tid + i];
           //printf("%llu sh2 %f \n", tid, sh[tid]);
@@ -30,8 +37,35 @@ __global__ void kernel_vecred_nobr(VectorView<AtomT> a, AtomT* res) {
 
     if (tid == 0){
         //printf("%llu res %f \n", tid, sh[0]);
-        atomicAdd(res, sh[0]);
+        blockSum[blockIdx.x] = sh[0];
     }
 }
+
+template <AtomKind AtomT>
+__global__ void kernel_vecred_final_nobr(AtomT* blockSum,
+                                    AtomT* res,
+                                    std::size_t blocks, std::size_t n)
+{
+    extern __shared__ AtomT sh[];
+    std::size_t tid = threadIdx.x;
+
+     if (tid < n) {
+            sh[tid] = blockSum[tid];
+        } else {
+            sh[tid] = static_cast<AtomT>(0);
+        }
+        __syncthreads();
+
+    for (std::size_t s = blockDim.x / 2; s > 0; s >>= 1)
+    {
+        if (tid < s)
+            sh[tid] += sh[tid + s];
+        __syncthreads();
+    }
+
+    if (tid == 0)
+        *res = sh[0];
+}
+
 
 #endif
