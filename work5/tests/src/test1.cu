@@ -16,16 +16,23 @@ TEST_F(VectorTest, VecsumNobrStrategy) {
     for (int i : sizes) {
       std::random_device rd;
       std::mt19937 gen(rd());
-      std::uniform_real_distribution<float> dist(-100.0f, 100.0f);
+      std::uniform_real_distribution<float> dist(-100.0f, 1.0f);
 
       float rand_const = dist(gen);
       
       Vector<float, VecsumNobrStrategy> vec(i);
-      vec.fill(rand_const);
+      //vec.fill(rand_const);
       
-      VectorXf eigen_vec = VectorXf::Constant(i, rand_const);
+      VectorXf eigen_vec = VectorXf::Random(i);
+      vec.data().copy_to_device(eigen_vec.data());
       
-      EXPECT_NEAR(vec.sum(), eigen_vec.sum(), 1e-4f);
+     // Выводим значения при неудаче 
+     EXPECT_NEAR(vec.sum(), eigen_vec.sum(), 1e-4f) << "Vector size: " << i //
+     // << "vectooooooooor" << vec.print() 
+      << "eigen vectoooor" << eigen_vec.data()[0] 
+      << "\nRandom constant: " << rand_const 
+      << "\nvec.sum(): " << vec.sum() 
+      << "\neigen_vec.sum(): " << eigen_vec.sum();
     }
 }
 

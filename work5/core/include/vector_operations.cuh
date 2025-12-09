@@ -6,7 +6,7 @@
 
 template <AtomKind AtomT, template<typename> typename Strategy>
 AtomT Vector<AtomT, Strategy>::sum() {
-    Data<AtomT> res_device(sizeof(AtomT));
+    Data<AtomT> res_device(1);
     AtomT res_host = 0;
     res_device.copy_to_device(&res_host);
 

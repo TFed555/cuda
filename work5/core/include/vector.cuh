@@ -24,10 +24,17 @@ class Vector {
     const VectorView<AtomT>& view() const { return view_; }
 
     void fill(AtomT val) {
-      dim3 block(16, 16);
-      dim3 grid = dim3((size() + dim3(16, 16).x - 1) / dim3(16, 16).x);
-      kernel_vector_fill<<<grid, block>>>(view_, val);
+      int blockSize = 256;
+      int gridSize  = (size() + blockSize - 1) / blockSize;
+
+      kernel_vector_fill<<<gridSize, blockSize>>>(view_, val);
       cudaDeviceSynchronize();
+
+      cudaError_t err = cudaGetLastError();
+      if (err != cudaSuccess) {
+          throw std::runtime_error(std::string("CUDA error: ") +
+                                  cudaGetErrorString(err));
+      }
     }
 
     AtomT sum();

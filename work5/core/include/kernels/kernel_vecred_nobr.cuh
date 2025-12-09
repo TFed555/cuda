@@ -14,19 +14,19 @@ __global__ void kernel_vecred_nobr(VectorView<AtomT> a, AtomT* blockSum) {
 
     //printf("%llu %llu \n", tid, t);
 
-    double sum = static_cast<double>(0);
+    AtomT sum = static_cast<AtomT>(0);
 
     for (size_t j = blockIdx.x * blockDim.x + tid; j < a.size(); j += gridDim.x * blockDim.x) {
-      sum += static_cast<double>(a[j]);
+      sum += a[j];
     }
 
-    sh[tid] = static_cast<AtomT>(sum);
+    sh[tid] = sum;
 
     //printf("%llu sh %f \n", tid, sh[tid]);
 
     __syncthreads();
 
-    #pragma unroll
+  
     for (std::size_t i = blockSize/2; i>0; i/=2) {
         if (tid < i) {
           sh[tid] += sh[tid + i];
@@ -49,7 +49,7 @@ __global__ void kernel_vecred_final_nobr(AtomT* blockSum,
     extern __shared__ AtomT sh[];
     std::size_t tid = threadIdx.x;
 
-     if (tid < n) {
+     if (tid < blocks) {
             sh[tid] = blockSum[tid];
         } else {
             sh[tid] = static_cast<AtomT>(0);

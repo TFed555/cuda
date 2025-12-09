@@ -16,7 +16,7 @@ public:
         std::size_t shm = block_size * sizeof(AtomT);
 
         Data<AtomT> partSum_device(blocks);
-        cudaMemset(partSum_device.data(), 0, blocks * sizeof(AtomT));
+        //cudaMemset(partSum_device.data(), 0, blocks * sizeof(AtomT));
 
         Derived<AtomT>::addImpl(blocks, block_size, shm, a, partSum_device.data());
 
