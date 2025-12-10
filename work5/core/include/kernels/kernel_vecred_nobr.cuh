@@ -10,9 +10,6 @@ __global__ void kernel_vecred_nobr(VectorView<AtomT> a, AtomT* blockSum) {
 
     std::size_t tid = threadIdx.x;
     std::size_t blockSize = blockDim.x;
-    //std::size_t t = blockIdx.x * blockDim.x + tid;
-
-    //printf("%llu %llu \n", tid, t);
 
     AtomT sum = static_cast<AtomT>(0);
 
@@ -22,21 +19,17 @@ __global__ void kernel_vecred_nobr(VectorView<AtomT> a, AtomT* blockSum) {
 
     sh[tid] = sum;
 
-    //printf("%llu sh %f \n", tid, sh[tid]);
-
     __syncthreads();
 
   
     for (std::size_t i = blockSize/2; i>0; i/=2) {
         if (tid < i) {
           sh[tid] += sh[tid + i];
-          //printf("%llu sh2 %f \n", tid, sh[tid]);
         }
         __syncthreads();
     }
 
     if (tid == 0){
-        //printf("%llu res %f \n", tid, sh[0]);
         blockSum[blockIdx.x] = sh[0];
     }
 }
