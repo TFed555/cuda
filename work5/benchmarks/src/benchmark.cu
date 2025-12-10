@@ -45,7 +45,7 @@ static void BENCHMARK_VecsumNobrStrategy(benchmark::State& state) {
     benchmark::DoNotOptimize(result_device);
 }
 
-BENCHMARK(BENCHMARK_VecsumNobrStrategy)->Name("VecsumNobrStrategy")->RangeMultiplier(2)->Range(8, 8 << 20);
+BENCHMARK(BENCHMARK_VecsumNobrStrategy)->Name("VecsumNobrStrategy")->RangeMultiplier(2)->Range(8, 8 << 27);
 
 static void BENCHMARK_VecsumBrStrategy(benchmark::State& state) {
     auto n = state.range(0);
@@ -79,6 +79,6 @@ static void BENCHMARK_VecsumBrStrategy(benchmark::State& state) {
     benchmark::DoNotOptimize(result_device);
 }
 
-BENCHMARK(BENCHMARK_VecsumBrStrategy)->Name("VecsumBrStrategy")->RangeMultiplier(2)->Range(8, 8 << 20);
+BENCHMARK(BENCHMARK_VecsumBrStrategy)->Name("VecsumBrStrategy")->RangeMultiplier(2)->Range(8, 8 << 27);
 
 BENCHMARK_MAIN();
