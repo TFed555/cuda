@@ -31,17 +31,14 @@ __global__ void kernel_vecred_br(VectorView<AtomT> a, AtomT* res) {
 
     if (laneId == 0) {
       sh[warpId] = value;
-     // printf("%llu sh %f \n", warpId, sh[warpId]);
     }
 
     __syncthreads();
 
     if (warpId == 0){
         int num_warps = blockDim.x / warpSize;
-       // printf("%llu ss %d \n", laneId, num_warps);
         value = laneId < num_warps ? sh[laneId] : 0;
         value = warp_reduce(value);
-       // printf("%llu shd bratik %f \n", laneId, value);
         if (laneId == 0) {
             atomicAdd(res, value);
         }

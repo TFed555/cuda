@@ -21,17 +21,12 @@ TEST_F(VectorTest, VecsumNobrStrategy) {
       float rand_const = dist(gen);
       
       Vector<float, VecsumNobrStrategy> vec(i);
-      //vec.fill(rand_const);
       
       VectorXf eigen_vec = VectorXf::Random(i);
       vec.data().copy_to_device(eigen_vec.data());
       
 
-     EXPECT_NEAR(vec.sum(), eigen_vec.sum(), 1e-4f) << "Vector size: " << i //
-      << "eigen vectoooor" << eigen_vec.data()[0] 
-      << "\nRandom constant: " << rand_const 
-      << "\nvec.sum(): " << vec.sum() 
-      << "\neigen_vec.sum(): " << eigen_vec.sum();
+     EXPECT_NEAR(vec.sum(), eigen_vec.sum(), 1e-4f);
     }
 }
 
@@ -46,15 +41,10 @@ TEST_F(VectorTest, VecsumBrStrategy) {
       float rand_const = dist(gen);
       
       Vector<float, VecsumBrStrategy> vec(i);
-      vec.fill(rand_const);
       
       VectorXf eigen_vec = VectorXf::Random(i);
       vec.data().copy_to_device(eigen_vec.data());
       
-      EXPECT_NEAR(vec.sum(), eigen_vec.sum(), 1e-4f) << "Vector size: " << i //
-      << "eigen vectoooor" << eigen_vec.data()[0] 
-      << "\nRandom constant: " << rand_const 
-      << "\nvec.sum(): " << vec.sum() 
-      << "\neigen_vec.sum(): " << eigen_vec.sum();
+      EXPECT_NEAR(vec.sum(), eigen_vec.sum(), 1e-4f);
     }
 }
