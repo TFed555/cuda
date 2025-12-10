@@ -17,9 +17,9 @@ def read_file() -> dict:
 def plot():
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_VecsumNobr],
-                             y=[obj['real_time'] for obj in objs_VecsumNobr], name="Vector Sum No Branch"))
+                             y=[obj['real_time'] for obj in objs_VecsumNobr], name="Vector Sum No Br"))
     fig.add_trace(go.Scatter(x=[obj['number_elements'] for obj in objs_VecsumBr],
-                             y=[obj['real_time'] for obj in objs_VecsumBr], name="Vector Sum Branch"))
+                             y=[obj['real_time'] for obj in objs_VecsumBr], name="Vector Sum Br"))
     fig.update_layout(legend_orientation="h",
                   legend=dict(x=.5, xanchor="center"),
                   title="Зависимость времени выполнения от количества элементов в векторе",
